@@ -206,7 +206,7 @@ if(outFormat=='jscad'||outFormat=='js') {
       out = csg.toStlBinary();                              // not yet supported
 
    } else if(outFormat=='stl'||outFormat=='stla') {
-      out = csg.toStlString();
+      out = csg.fixTJunctions().toStlString();
 
    } else {
       console.log("ERROR: only jscad, stl or amf as output format");
