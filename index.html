@@ -10,6 +10,8 @@ Purpose:
    More modern interface for OpenJsCad as published at http://joostn.github.com/OpenJsCad/
 
 History:
+- 2015/01/07: 0.019: various pull requests from github merged again
+- 2014/10/05: 0.018: various pull requests from github merged
 - 2013/04/11: 0.017: alpha channel supported in color() and .setColor()
 - 2013/04/07: 0.016: csg.js: solidFromSlices() and .setColor() on polygon level, and examples by Eduard Bespalov
 - 2013/04/05: 0.015: rudimentary AMF export and import, web and cli
@@ -56,7 +58,7 @@ Todo:
 <script src="underscore.js"></script>
 <script src="openscad-openjscad-translator.js"></script>
 <script lang=JavaScript>
-var version = '0.017 (2014/02/14)';
+var version = '0.019 (2015/01/07)';
 //$(function() { $("#parametersdiv").draggable(); }); // doesn't work well, disabled
 var me = document.location.toString().match(/^file:/)?'web-offline':'web-online'; // me: {cli, web-offline, web-online}
 var browser = 'unknown';
@@ -119,7 +121,10 @@ $(document).ready(function() {
    });
 });   
 </script>
-<img id="header" src="imgs/title.png">
+<div id="header">
+<img src="imgs/title.png">
+<div id="errordiv"></div>
+</div>
 
 <div id=menu>
 <img id=menuHandle src="imgs/menuHandleVL.png">
@@ -378,7 +383,6 @@ if(me=='web-online') {
 <div id="parametersdiv"></div>
 <div id="tail">
 <div id="statusdiv"></div>
-<div id="errordiv"></div>
 <div id="filedropzone">
   <div id="filedropzone_empty">
   <script>document.write("Drop your jscad, scad, amf, stl file or multiple jscad files "+
@@ -854,7 +858,7 @@ function superviseAllFiles(p) {           // check if there were changes: (re-)l
    if(p&&p.forceReload) 
       gMemFsChanged++;
    
-   if(!gRootFs||me=='web-offline') {              // walkFileTree won't work with file:// (regardless of chrome|firefox)
+   if(!gRootFs||gRootFs.length==0||me=='web-offline') {              // walkFileTree won't work with file:// (regardless of chrome|firefox)
      for(var i=0; i<gCurrentFiles.length; i++) {
         console.log("[offline] checking "+gCurrentFiles[i].name);
         gMemFsTotal++;

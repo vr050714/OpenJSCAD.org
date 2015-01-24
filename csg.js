@@ -5767,9 +5767,16 @@ CAG.prototype = {
 		return paths;
 	},
 
-	toDxf: function() {
+	toDxfString: function() {
 		var paths = this.getOutlinePaths();
 		return CAG.PathsToDxf(paths);
+	},
+
+	toDxf: function() {
+		var str = this.toDxfString();
+		return new Blob([str], {
+			type: "application/dxf"
+		});
 	}
 };
 
@@ -5801,9 +5808,7 @@ CAG.PathsToDxf = function(paths) {
 		}
 	});
 	str += "  0\nENDSEC\n  0\nEOF\n";
-	return new Blob([str], {
-		type: "application/dxf"
-	});
+	return str;
 };
 
 CAG.Vertex = function(pos) {

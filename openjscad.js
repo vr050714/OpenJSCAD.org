@@ -493,12 +493,16 @@ OpenJsCad.Viewer.csgToMeshes = function(initial_csg) {
       mesh.colors = colors;
       mesh.computeWireframe();
       mesh.computeNormals();
+
+      if ( mesh.vertices.length ) {
+        meshes.push(mesh);
+      }
+
       // start a new mesh
       mesh = new GL.Mesh({ normals: true, colors: true });
       triangles = [];
       colors = [];
       vertices = [];
-      meshes.push(mesh);	
     }
   }
   // finalize last mesh
@@ -507,6 +511,11 @@ OpenJsCad.Viewer.csgToMeshes = function(initial_csg) {
   mesh.colors = colors;
   mesh.computeWireframe();
   mesh.computeNormals();
+
+  if ( mesh.vertices.length ) {
+    meshes.push(mesh);
+  }
+
   return meshes;
 };
 
@@ -572,9 +581,9 @@ OpenJsCad.runMainInWorker = function(mainParameters) {
     self.postMessage({cmd: 'rendered', result: result_compact});
   }
   catch(e) {
-    var errtxt = e.stack;
-    if(!errtxt) {
-      errtxt = e.toString();
+    var errtxt = e.toString();
+    if(e.stack) {
+      errtxt += '\nStack trace:\n'+e.stack;
     } 
     self.postMessage({cmd: 'error', err: errtxt});
   }
@@ -802,7 +811,7 @@ OpenJsCad.getWindowURL = function() {
 
 OpenJsCad.textToBlobUrl = function(txt) {
   var windowURL=OpenJsCad.getWindowURL();
-  var blob = new Blob([txt]);
+  var blob = new Blob([txt], { type : 'application/javascript' });
   var blobURL = windowURL.createObjectURL(blob);
   if(!blobURL) throw new Error("createObjectURL() failed"); 
   return blobURL;
@@ -1154,7 +1163,7 @@ OpenJsCad.Processor.prototype = {
   
   setError: function(txt) {
     this.hasError = (txt != "");
-    this.errorpre.innerText = txt;
+    this.errorpre.textContent = txt;
     this.enableItems();
   },
   
@@ -1211,10 +1220,10 @@ OpenJsCad.Processor.prototype = {
       }
       var control = this.paramControls[i];
       var value = null;
-      if( (type == "text") || (type == "float") || (type == "int") )
+      if( (type == "text") || (type == "float") || (type == "int") || (type == "number") )
       {
         value = control.value;
-        if( (type == "float") || (type == "int") )
+        if( (type == "float") || (type == "int") || (type == "number") )
         {
           var isnumber = !isNaN(parseFloat(value)) && isFinite(value);
           if(!isnumber)
@@ -1295,12 +1304,10 @@ OpenJsCad.Processor.prototype = {
       catch(e)
       {
         that.processing = false;
-        var errtxt = e.stack;
-        if(!errtxt)
-        {
-          errtxt = e.toString();
-        }
-        that.setError(errtxt);
+        var errtxt = e.toString();
+        if(e.stack) {
+          errtxt += '\nStack trace:\n'+e.stack;
+        } 
         that.statusspan.innerHTML = "Error.";
       }
       that.enableItems();
@@ -1506,15 +1513,18 @@ OpenJsCad.Processor.prototype = {
       {
         type = paramdef.type;
       }
-      if( (type !== "text") && (type !== "int") && (type !== "float") && (type !== "choice") )
+      if( (type !== "text") && (type !== "int") && (type !== "float") && (type !== "choice") && (type !== "number") )
       {
         throw new Error(errorprefix + "Unknown parameter type '"+type+"'");
       }
       var control;
-      if( (type == "text") || (type == "int") || (type == "float") )
+      if( (type == "text") || (type == "int") || (type == "float") || (type == "number") )
       {
         control = document.createElement("input");
-        control.type = "text";
+        if (type == "number")
+            control.type = "number";
+        else
+            control.type = "text";
         if('default' in paramdef)
         {
           control.value = paramdef["default"];
@@ -1523,7 +1533,7 @@ OpenJsCad.Processor.prototype = {
           control.value = paramdef.initial;
         else
         {
-          if( (type == "int") || (type == "float") )
+          if( (type == "int") || (type == "float") || (type == "number") )
           {
             control.value = "0";
           }
@@ -1534,6 +1544,10 @@ OpenJsCad.Processor.prototype = {
         }
         if(paramdef.size!==undefined) 
            control.size = paramdef.size;
+        for (var property in paramdef)
+            if (paramdef.hasOwnProperty (property))
+                if ((property != "name") && (property != "type") && (property != "default") && (property != "initial") && (property != "caption"))
+                    control.setAttribute (property, paramdef[property]);
       }
       else if(type == "choice")
       {
