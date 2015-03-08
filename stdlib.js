@@ -4,63 +4,6 @@
 
 var std = {
 
-    nema17: function() {
-		// creates NEMA 17 motor
-		var s1 = 42.2;  // body width
-		var s2 = 34.0;  // body side length
-		var s3 = 48.0;  // body height
-		var s4 = 5.0;   // shaft diameter
-		var s5 = 20.0;  // shaft length
-		var s6 = 2.0;   // bumper height
-		var s7 = 22.0;  // bumper outer diameter
-		var s8 = 7.0;   // bumper inner diameter
-		var s9 = 3.0;   // M3 hole
-		var s10 = 5.0;  // M3 hole depth
-		var s11 = 31.0; // distance between M3 holes
-	
-		var shaft = CSG.cylinder({
-			start: [0, 0, 0],
-			end: [0, 0, s5],
-			radius: s4/2.0,
-			resolution: 16
-		});
-	
-		var screwM3 = CSG.cylinder({
-			start: [0, 0, 0],
-			end: [0, 0, -s10],
-			radius: s9/2.0,
-			resolution: 16
-		});
-	
-		var bumper = CSG.cylinder({
-			start: [0, 0, 0],
-			end: [0, 0, s6],
-			radius: s7/2.0,
-			resolution: 32
-		}).subtract(CSG.cylinder({
-			start: [0, 0, 0],
-			end: [0, 0, s6],
-			radius: s8/2.0,
-			resolution: 32
-		}));
-	
-		var nemaOutline = [
-			[ s1/2.0, s2/2.0], [ s2/2.0, s1/2.0],
-			[-s2/2.0, s1/2.0], [-s1/2.0, s2/2.0],
-			[-s1/2.0,-s2/2.0], [-s2/2.0,-s1/2.0],
-			[ s2/2.0,-s1/2.0], [ s1/2.0,-s2/2.0]];
-		
-		var nemaBox = CAG.fromPoints(nemaOutline)
-                         .extrude({offset: [0,0,-s3]});
-         
-		return nemaBox.union(shaft)
-					  .union(bumper)
-					  .subtract(screwM3.translate([ s11/2.0, s11/2.0, 0]))
-					  .subtract(screwM3.translate([-s11/2.0, s11/2.0, 0]))
-					  .subtract(screwM3.translate([-s11/2.0,-s11/2.0, 0]))
-					  .subtract(screwM3.translate([ s11/2.0,-s11/2.0, 0]));
-    },
-    
     washer: {
             
 	    create: function(Din, Dout, h) {
@@ -111,12 +54,91 @@ var std = {
         M10:  function() { return this.create(10.0, 16.0,  8.4); },
         M12:  function() { return this.create(12.0, 18.0, 10.8); },
         M14:  function() { return this.create(14.0, 21.0, 12.8); }
-    }
+    },
 
+    bolt: {
+
+        create: function() {
+            return null;
+        }
+        
+        // TODO: add bolts
+    },
+    
+    stepper: {
+
+        createNEMA: function(D, L, d, e, b, c, a, f, g) {
+            // D - body width
+            // L - body height
+            // d - bumper outer diameter
+            // e - bumper height
+            // b - shaft diameter
+            // c - shaft length
+            // a - distance between bolt holes
+            // f - bolt hole diameter
+            // g - bolt hole depth
+            
+            var d1 = b + 4; // bumper inner diameter
+        
+            var shaft = CSG.cylinder({
+                start: [0, 0, 0],
+                end: [0, 0, c],
+                radius: b/2.0,
+                resolution: 16
+            });
+        
+            var screwM3 = CSG.cylinder({
+                start: [0, 0, 0],
+                end: [0, 0, -g],
+                radius: f/2.0,
+                resolution: 16
+            });
+        
+            var bumper = CSG.cylinder({
+                start: [0, 0, 0],
+                end: [0, 0, e],
+                radius: d/2.0,
+                resolution: 32
+            }).subtract(CSG.cylinder({
+                start: [0, 0, 0],
+                end: [0, 0, e],
+                radius: d1/2.0,
+                resolution: 32
+            }));
+                    
+            var nemaBox = CAG.roundedRectangle({
+                              center: [0,0],
+                              radius: [0.5*D, 0.5*D],
+                              roundradius: 0.5*(D-a),
+                              resolution: 16
+                          }).extrude({offset: [0,0,-L]});
+             
+            return nemaBox.union(shaft)
+                          .union(bumper)
+                          .subtract(screwM3.translate([ a/2.0, a/2.0, 0]))
+                          .subtract(screwM3.translate([-a/2.0, a/2.0, 0]))
+                          .subtract(screwM3.translate([-a/2.0,-a/2.0, 0]))
+                          .subtract(screwM3.translate([ a/2.0,-a/2.0, 0]));
+        },
+        
+        /* nemaDDLL
+         *   DD - motor size
+         *   LL - motor length
+         */
+        nema14: function() { return this.createNEMA(35.3, 26.0, 22.0, 2.0, 5.0, 24.0, 26.0, 3, 3.5); },
+        nema17: function() { return this.nema1719(); },
+        
+        nema1713: function() { return this.createNEMA(42.3, 33.0, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5); },
+        nema1715: function() { return this.createNEMA(42.3, 38.1, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5); },
+        nema1719: function() { return this.createNEMA(42.3, 48.3, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5); },
+        
+        nema2318: function() { return this.createNEMA(56.4, 45.7, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0); },
+        nema2322: function() { return this.createNEMA(56.4, 55.9, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0); },
+        nema2331: function() { return this.createNEMA(56.4, 78.7, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0); }
+    }
+    
     /* TODO:
-     *   - add bolts
      *   - add gears
-     *   - add NEMA motors of different sizes
      *   - add servos
      */
 };
