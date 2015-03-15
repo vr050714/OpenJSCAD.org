@@ -4370,7 +4370,7 @@ CSG.reTesselateCoplanarPolygons = function(sourcepolygons, destpolygons) {
 						topleft: vertices2d[topleftvertexindex],
 						topright: vertices2d[toprightvertexindex],
 						bottomleft: vertices2d[nextleftvertexindex],
-						bottomright: vertices2d[nextrightvertexindex],
+						bottomright: vertices2d[nextrightvertexindex]
 					};
 					insertSorted(activepolygons, newactivepolygon, function(el1, el2) {
 						var x1 = CSG.interpolateBetween2DPointsForY(
