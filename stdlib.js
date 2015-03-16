@@ -142,6 +142,14 @@ var std = {
     gear: {
     	create: function(param) {
             /*
+            This code was copied over Inkscape python extension script with small modifications:
+              - converted from python to javascript
+              - added more points on the involute curve
+              - added warning if undercut is required
+              - gear has a bore
+             */
+
+            /*
             Copyright (C) 2007 Aaron Spike  (aaron @ ekips.org)
             Copyright (C) 2007 Tavmjong Bah (tavmjong @ free.fr)
 
@@ -210,8 +218,12 @@ var std = {
             //var tooth  = ( pi * pitch_diameter ) / ( 2.0 * teeth );
 
             // Undercut?
-            //var undercut = 2.0 / Math.pow( Math.sin(angle), 2 );
-            //var needs_undercut = teeth < undercut;
+            var undercut = 2.0 / Math.pow( Math.sin(angle), 2 );
+            var needs_undercut = teeth < undercut;
+
+            if (needs_undercut) {
+                console.warn('gear needs undercut but it is not implemented');
+            }
 
             // Clearance: Radial distance between top of tooth on one gear to bottom of gap on another.
             var clearance = 0.0;
@@ -240,7 +252,11 @@ var std = {
                 b2, p2, o2;
 
             var pitch_to_root_angle, c,
-                root1, root2, r1, r2, p_tmp;
+                root1, root2, r1, r2, p_tmp,
+                point_radius_1, point_angle_1,
+                point_radius_2, point_angle_2;
+
+            var Np = 3; // number of extra points on involute to get it smooth
 
             for (var n = 0; n < centers.length; n++) {
                 c = centers[n];
@@ -256,11 +272,9 @@ var std = {
 
                 // Points
                 b1 = point_on_circle(base_radius,  base1);
-                p1 = point_on_circle(pitch_radius, pitch1);
                 o1 = point_on_circle(outer_radius, outer1);
 
                 b2 = point_on_circle(base_radius,  base2);
-                p2 = point_on_circle(pitch_radius, pitch2);
                 o2 = point_on_circle(outer_radius, outer2);
 
                 if (root_radius > base_radius) {
@@ -269,19 +283,40 @@ var std = {
                     root2 = pitch2 + pitch_to_root_angle;
                     r1 = point_on_circle(root_radius, root1);
                     r2 = point_on_circle(root_radius, root2);
-                    p_tmp = [r1, p1, o1, o2, p2, r2];
+                    p1 = [];
+                    p2 = [];
+                    for (var m = 1; m <= Np; m++) {
+                        point_radius_1 = root_radius + (outer_radius - root_radius) * m / (Np + 1);
+                        point_radius_2 = root_radius + (outer_radius - root_radius) * (Np + 1 - m ) / (Np + 1);
+                        point_angle_1 = base1 + involute_intersect_angle(base_radius, point_radius_1);
+                        point_angle_2 = base2 - involute_intersect_angle(base_radius, point_radius_2);
+                        p1.push(point_on_circle(point_radius_1, point_angle_1));
+                        p2.push(point_on_circle(point_radius_2, point_angle_2));
+                    }
+                    p_tmp = [].concat(r1, p1, o1, o2, p2, r2);
                 } else {
                     r1 = point_on_circle(root_radius, base1);
                     r2 = point_on_circle(root_radius, base2);
-                    p_tmp = [r1, b1, p1, o1, o2, p2, b2, r2];
+                    p1 = [];
+                    p2 = [];
+                    for (var m = 1; m <= Np; m++) {
+                        point_radius_1 = base_radius + (outer_radius - base_radius) * m / (Np + 1);
+                        point_radius_2 = base_radius + (outer_radius - base_radius) * (Np + 1 - m) / (Np + 1);
+                        point_angle_1 = base1 + involute_intersect_angle(base_radius, point_radius_1);
+                        point_angle_2 = base2 - involute_intersect_angle(base_radius, point_radius_2);
+                        p1.push(point_on_circle(point_radius_1, point_angle_1));
+                        p2.push(point_on_circle(point_radius_2, point_angle_2));
+                    }
+                    p_tmp = [].concat(r1, b1, p1, o1, o2, p2, b2, r2);
                 }
 
                 points = points.concat(p_tmp);
             }
 
             return CAG.fromPoints(points)
-                      .extrude({offset: [0,0,thickness]})
-                      .subtract(CSG.cylinder({radius: 0.5*bore, start: [0,0,0], end: [0,0,thickness], resolution: 16}));
+                      .subtract(CAG.circle({center: [0,0], radius: 0.5*bore, resolution: 16}))
+                      .extrude({offset: [0,0,thickness]});
+
     	}
     }
 
