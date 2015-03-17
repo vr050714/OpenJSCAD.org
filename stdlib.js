@@ -143,10 +143,9 @@ var std = {
     	create: function(param) {
             /*
             This code was copied over Inkscape python extension script with small modifications:
-              - converted from python to javascript
+              - converted from python to javascript and refactored
               - added more points on the involute curve
               - added warning if undercut is required
-              - gear has a bore
              */
 
             /*
@@ -177,7 +176,11 @@ var std = {
             var pitch = getPropertyValue(param, 'pitch');
             var angle = getPropertyValue(param, 'angle');
             var thickness = getPropertyValue(param, 'thickness');
-            var bore = getPropertyValue(param, 'bore');
+            var bore = undefined;
+            var resolution = 16;
+
+            if ('bore' in param) bore = param['bore'];
+            if ('resolution' in param) resolution = param['resolution'];
 
             function involute_intersect_angle(Rb, R) {
                 return Math.sqrt(R*R - Rb*Rb) / Rb - Math.acos(Rb / R);
@@ -233,90 +236,54 @@ var std = {
 
             // Root diameter: Diameter of bottom of tooth spaces.
             var root_radius =  pitch_radius - dedendum;
-            //var root_diameter = root_radius * 2.0;
 
             var half_thick_angle = two_pi / (4.0 * teeth );
             var pitch_to_base_angle  = involute_intersect_angle( base_radius, pitch_radius );
-            var pitch_to_outer_angle = involute_intersect_angle( base_radius, outer_radius ) - pitch_to_base_angle;
 
             var centers = [];
-            for (var x = 0; x < teeth; x++) {
-                centers.push(x * two_pi / teeth);
-            }
+            for (var x = 0; x < teeth; x++) centers.push(x * two_pi / teeth);
 
-            var points = [];
-
-            var pitch1, base1, outer1,
-                pitch2, base2, outer2,
-                b1, p1, o1,
-                b2, p2, o2;
-
-            var pitch_to_root_angle, c,
-                root1, root2, r1, r2, p_tmp,
-                point_radius_1, point_angle_1,
-                point_radius_2, point_angle_2;
-
-            var Np = 3; // number of extra points on involute to get it smooth
-
-            for (var n = 0; n < centers.length; n++) {
-                c = centers[n];
-
+            var points = centers.map(function(c) {
                 // Angles
-                pitch1 = c - half_thick_angle;
-                base1 = pitch1 - pitch_to_base_angle;
-                outer1 = pitch1 + pitch_to_outer_angle;
+                var pitch1 = c - half_thick_angle;
+                var base1 = pitch1 - pitch_to_base_angle;
 
-                pitch2 = c + half_thick_angle;
-                base2 = pitch2 + pitch_to_base_angle;
-                outer2 = pitch2 - pitch_to_outer_angle;
+                var pitch2 = c + half_thick_angle;
+                var base2 = pitch2 + pitch_to_base_angle;
 
                 // Points
-                b1 = point_on_circle(base_radius,  base1);
-                o1 = point_on_circle(outer_radius, outer1);
-
-                b2 = point_on_circle(base_radius,  base2);
-                o2 = point_on_circle(outer_radius, outer2);
-
+                var r1, r2, start_radius;
                 if (root_radius > base_radius) {
-                    pitch_to_root_angle = pitch_to_base_angle - involute_intersect_angle(base_radius, root_radius);
-                    root1 = pitch1 - pitch_to_root_angle;
-                    root2 = pitch2 + pitch_to_root_angle;
-                    r1 = point_on_circle(root_radius, root1);
-                    r2 = point_on_circle(root_radius, root2);
-                    p1 = [];
-                    p2 = [];
-                    for (var m = 1; m <= Np; m++) {
-                        point_radius_1 = root_radius + (outer_radius - root_radius) * m / (Np + 1);
-                        point_radius_2 = root_radius + (outer_radius - root_radius) * (Np + 1 - m ) / (Np + 1);
-                        point_angle_1 = base1 + involute_intersect_angle(base_radius, point_radius_1);
-                        point_angle_2 = base2 - involute_intersect_angle(base_radius, point_radius_2);
-                        p1.push(point_on_circle(point_radius_1, point_angle_1));
-                        p2.push(point_on_circle(point_radius_2, point_angle_2));
-                    }
-                    p_tmp = [].concat(r1, p1, o1, o2, p2, r2);
+                    // involute curve starts directly from root
+                    r1 = [];
+                    r2 = [];
+                    start_radius = root_radius;
                 } else {
+                    // insert straight line segment from root to base
                     r1 = point_on_circle(root_radius, base1);
                     r2 = point_on_circle(root_radius, base2);
-                    p1 = [];
-                    p2 = [];
-                    for (var m = 1; m <= Np; m++) {
-                        point_radius_1 = base_radius + (outer_radius - base_radius) * m / (Np + 1);
-                        point_radius_2 = base_radius + (outer_radius - base_radius) * (Np + 1 - m) / (Np + 1);
-                        point_angle_1 = base1 + involute_intersect_angle(base_radius, point_radius_1);
-                        point_angle_2 = base2 - involute_intersect_angle(base_radius, point_radius_2);
-                        p1.push(point_on_circle(point_radius_1, point_angle_1));
-                        p2.push(point_on_circle(point_radius_2, point_angle_2));
-                    }
-                    p_tmp = [].concat(r1, b1, p1, o1, o2, p2, b2, r2);
+                    start_radius = base_radius;
                 }
 
-                points = points.concat(p_tmp);
-            }
+                var pp = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]; // defines points distribution on the involute curve
+                var point_radius = pp.map(function(p){ return start_radius + (outer_radius - start_radius) * p; });
+                var p1 = point_radius.map(function(pr) { return point_on_circle(pr, base1 + involute_intersect_angle(base_radius, pr)); });
+                var p2 = point_radius.map(function(pr) { return point_on_circle(pr, base2 - involute_intersect_angle(base_radius, pr)); });
 
-            return CAG.fromPoints(points)
-                      .subtract(CAG.circle({center: [0,0], radius: 0.5*bore, resolution: 16}))
-                      .extrude({offset: [0,0,thickness]});
+                return [].concat(r1, p1, p2.reverse(), r2);
+            });
 
+            points = [].concat.apply([],points);
+
+            var result = CAG.fromPoints(points);
+
+            if (bore != undefined) result = result.subtract(CAG.circle({
+                center: [0, 0],
+                radius: 0.5 * bore,
+                resolution: resolution
+            }));
+
+            return result.extrude({offset: [0,0,thickness]});
     	}
     }
 
