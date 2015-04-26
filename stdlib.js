@@ -224,10 +224,6 @@ var std = {
             var undercut = 2.0 / Math.pow( Math.sin(angle), 2 );
             var needs_undercut = teeth < undercut;
 
-            if (needs_undercut) {
-                console.warn('gear needs undercut but it is not implemented');
-            }
-
             // Clearance: Radial distance between top of tooth on one gear to bottom of gap on another.
             var clearance = 0.0;
 
@@ -285,8 +281,62 @@ var std = {
 
             return result.extrude({offset: [0,0,thickness]});
     	}
-    }
+    },
 
+	cuts: {
+		nema: function() {
+			return null;
+		},
+		
+		hole: function(p) {
+			/*
+			Parameters:
+				style: 'octagon', 'corner', 'flat'
+				depth: depth of the hole
+				diameter: diameter of the hole
+				resolution: resolution of the circle
+			*/
+			var Depth = 'depth' in p ? p['depth'] : 100;
+			var d = 'diameter' in p ? p['diameter'] : 8;
+			var CutStyle = 'style' in p ? p['style'] : 'flat';
+			var Resolution = 'resolution' in p ? p['resolution'] : 64;
+			var Points = [];/*
+			var phi = 0;
+			var R = 0;
+			var n = 0;
+			switch (CutStyle) {
+				case 'octagon':
+					R = 0.5 * d / Math.cos(Math.Pi / 8.0);
+					for (n = 0; n<8; n++) {
+						phi = - 7.0 * Math.PI / 8.0 + n * Math.PI / 4.0;
+						Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
+					}
+					break;
+				case 'corner':
+					Resolution = 3 * Math.ceil(Resolution / 4.0);
+					R = 0.5 * d / Math.cos(0.75 * Math.PI / Resolution);
+					for (n = 0; n < Resolution; n++) {
+						phi = - 0.75 * Math.PI + (n + 0.5) * 1.5 * Math.PI / Resolution;
+						Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
+					}
+					Points.push([-R * Math.sqrt(2), 0]);
+					break;
+				default:
+					// 'flat' by default
+			}*/
+			Points.push([-1,-1]);
+			Points.push([ 1,-1]);
+			Points.push([ 1, 1]);
+			Points.push([-1, 1]);
+			console.log(Points);
+			console.log(Depth);
+			return CAG.fromPoints(Points)
+					  .extrude({offset:[0,0,Depth]})
+					  .rotateY(90);
+
+		}
+	}
+	
     /*
     TODO: add servos
      */
