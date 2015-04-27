@@ -418,7 +418,9 @@ module.std = {
         OctagonalHole: function(d, h) {
             var p = {};
             p.style = 'octagon';
-            if (typeof d !== 'undefined') p.diameter = d;
+            if (typeof d === 'undefined')
+                throw new Error('input argument "d" is undefined');
+            p.diameter = d;
             if (typeof h !== 'undefined') p.depth = h;
             return this.hole(p);
         },
@@ -426,7 +428,9 @@ module.std = {
         RightAngleHole: function(d, h) {
             var p = {};
             p.style = 'corner';
-            if (typeof d !== 'undefined') p.diameter = d;
+            if (typeof d === 'undefined')
+                throw new Error('input argument "d" is undefined');
+            p.diameter = d;
             if (typeof h !== 'undefined') p.depth = h;
             return this.hole(p);
         },
@@ -434,7 +438,9 @@ module.std = {
         FlatRoundHole: function(d, h) {
             var p = {};
             p.style = 'flat';
-            if (typeof d !== 'undefined') p.diameter = d;
+            if (typeof d === 'undefined')
+                throw new Error('input argument "d" is undefined');
+            p.diameter = d;
             if (typeof h !== 'undefined') p.depth = h;
             return this.hole(p);
         }
