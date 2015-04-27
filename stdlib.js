@@ -369,14 +369,18 @@ module.std = {
                   diameter: diameter of the hole
                 resolution: resolution of the circle
              */
-            var Depth = p !== undefined && 'depth' in p ? p['depth'] : 100;
-            var d = p !== undefined && 'diameter' in p ? p['diameter'] : 8;
-            var CutStyle = p !== undefined && 'style' in p ? p['style'] : 'flat';
-            var Resolution = p !== undefined && 'resolution' in p ? p['resolution'] : 64;
+            if (typeof p === 'undefined') p = {};
+
+            var Depth      = 'depth'      in p ? p['depth']      : 100;
+            var d          = 'diameter'   in p ? p['diameter']   : 8;
+            var CutStyle   = 'style'      in p ? p['style']      : 'flat';
+            var Resolution = 'resolution' in p ? p['resolution'] : 64;
+
             var Points = [];
             var phi = 0;
             var R = 0;
             var n = 0;
+
             switch (CutStyle) {
                 case 'octagon':
                     R = 0.5 * d / Math.cos(Math.PI / 8.0);
@@ -409,7 +413,32 @@ module.std = {
                     break;
             }
             return CAG.fromPoints(Points).extrude({offset:[0,0,Depth]}).rotateY(90);
+        },
+
+        OctagonalHole: function(d, h) {
+            var p = {};
+            p.style = 'octagon';
+            if (typeof d !== 'undefined') p.diameter = d;
+            if (typeof h !== 'undefined') p.depth = h;
+            return this.hole(p);
+        },
+
+        RightAngleHole: function(d, h) {
+            var p = {};
+            p.style = 'corner';
+            if (typeof d !== 'undefined') p.diameter = d;
+            if (typeof h !== 'undefined') p.depth = h;
+            return this.hole(p);
+        },
+
+        FlatRoundHole: function(d, h) {
+            var p = {};
+            p.style = 'flat';
+            if (typeof d !== 'undefined') p.diameter = d;
+            if (typeof h !== 'undefined') p.depth = h;
+            return this.hole(p);
         }
+
     }
 
     /*
