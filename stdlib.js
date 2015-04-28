@@ -355,12 +355,8 @@ module.std = {
         }
     },
 
-    cuts: {
-        nema: function () {
-            return null;
-        },
-
-        hole: function (p) {
+    hole: {
+        createCuttingObject: function (p) {
             /*
              Creates printable cylinder without overhanging faces.
              Parameters:
@@ -415,34 +411,34 @@ module.std = {
             return CAG.fromPoints(Points).extrude({offset:[0,0,Depth]}).rotateY(90);
         },
 
-        OctagonalHole: function(d, h) {
+        octagon: function(d, h) {
             var p = {};
             p.style = 'octagon';
             if (typeof d === 'undefined')
                 throw new Error('input argument "d" is undefined');
             p.diameter = d;
             if (typeof h !== 'undefined') p.depth = h;
-            return this.hole(p);
+            return this.createCuttingObject(p);
         },
 
-        RightAngleHole: function(d, h) {
+        drop: function(d, h) {
             var p = {};
             p.style = 'corner';
             if (typeof d === 'undefined')
                 throw new Error('input argument "d" is undefined');
             p.diameter = d;
             if (typeof h !== 'undefined') p.depth = h;
-            return this.hole(p);
+            return this.createCuttingObject(p);
         },
 
-        FlatRoundHole: function(d, h) {
+        flat: function(d, h) {
             var p = {};
             p.style = 'flat';
             if (typeof d === 'undefined')
                 throw new Error('input argument "d" is undefined');
             p.diameter = d;
             if (typeof h !== 'undefined') p.depth = h;
-            return this.hole(p);
+            return this.createCuttingObject(p);
         }
 
     }
