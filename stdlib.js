@@ -384,4 +384,68 @@ module.std = {
      */
 };
 
+    /**
+     * std.geom namespace is a set of classes that help in the calculation of point coordinates on the plane.
+     */
+
+    var Line = function(prm) {
+        if (typeof(prm)==='undefined') throw new Error('parameters are undefined');
+        if ('p1' in prm && 'p2' in prm) {
+            if (typeof(prm['p1']) !== 'object' || length(prm['p1']) != 2) throw new Error('p1 is not 1x2 element array');
+            if (typeof(prm['p2']) !== 'object' || length(prm['p2']) != 2) throw new Error('p2 is not 1x2 element array');
+            var p1 = prm['p1'];
+            var p2 = prm['p2'];
+            var tx = p2[0]-p1[0];
+            var ty = p2[1]-p1[1];
+            var tn = Math.sqrt(tx*tx+ty*ty);
+            this.norm = [-ty/tn, tx/tn];
+            this.dist = this.norm[0]*p1[0]+this.norm[1]*p1[1];
+        } else if ('norm' in prm && 'dist' in prm) {
+            if (typeof(prm['norm']) !== 'object' || length(prm['norm']) != 2) throw new Error('norm is not 1x2 element array');
+            if (typeof(prm['dist']) !== 'number') throw new Error('dist is not a number');
+            this.norm = prm['norm'];
+            this.dist = prm['dist'];
+        } else throw new Error('wrong parameters');
+    };
+
+    Line.prototype.intersect = function(that) {
+        if (typeof(that) === 'Line') {
+            var det = this.norm[0]*that.norm[1]-that.norm[0]*this.norm[1];
+            if (Math.abs(det) > 1e-15)
+                return [(this.dist    * that.norm[1] - that.dist    * this.norm[1]) / det,
+                        (this.norm[0] * that.dist    - that.norm[0] * this.dist   ) / det];
+            else return null; // lines are parallel
+        } else if (typeof(that) === 'Segment')
+            return this.intersect(new Line({p1: that.p1, p2: that.p2}));
+        else throw new Error('unsupported type');
+    };
+
+    Line.prototype.distance = function(p) {
+        if (typeof(p) !== 'object' || length(p) != 2) throw new Error('p is not 1x2 element array');
+        return this.norm[0]*p[0]+this.norm[1]*p[1]-this.dist;
+    };
+
+    var Segment = function(p1, p2) {
+        if (typeof(p1) !== 'object' || length(p1) != 2) throw new Error('p1 is not 1x2 element array');
+        if (typeof(p2) !== 'object' || length(p2) != 2) throw new Error('p2 is not 1x2 element array');
+        this.p1 = p1;
+        this.p2 = p2;
+    };
+
+    Segment.prototype.intersect = function(that) {
+        if (typeof(that) === 'Segment') {
+            // TODO: implement this feature
+        } else if (typeof(that) === 'Line')
+            if (that.distance(this.p1)*that.distance(this.p2) <= 0 )
+                return that.intersect(new Line({p1: this.p1, p2: this.p2}));
+            else return null;
+        else throw new Error('unsupported type');
+    };
+
+    var geom = {};
+    geom.Line = Line;
+    geom.Segment = Segment;
+
+    module.geom = geom;
+
 }(this));
