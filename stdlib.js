@@ -393,8 +393,8 @@ module.std = {
         if ('p1' in prm && 'p2' in prm) {
             if (typeof(prm['p1']) !== 'object' || length(prm['p1']) != 2) throw new Error('p1 is not 1x2 element array');
             if (typeof(prm['p2']) !== 'object' || length(prm['p2']) != 2) throw new Error('p2 is not 1x2 element array');
-            var p1 = prm['p1'];
-            var p2 = prm['p2'];
+            var p1 = prm['p1'].slice(0);
+            var p2 = prm['p2'].slice(0);
             var tx = p2[0]-p1[0];
             var ty = p2[1]-p1[1];
             var tn = Math.sqrt(tx*tx+ty*ty);
@@ -403,7 +403,7 @@ module.std = {
         } else if ('norm' in prm && 'dist' in prm) {
             if (typeof(prm['norm']) !== 'object' || length(prm['norm']) != 2) throw new Error('norm is not 1x2 element array');
             if (typeof(prm['dist']) !== 'number') throw new Error('dist is not a number');
-            this.norm = prm['norm'];
+            this.norm = prm['norm'].slice(0);
             this.dist = prm['dist'];
         } else throw new Error('wrong parameters');
     };
@@ -428,18 +428,27 @@ module.std = {
     var Segment = function(p1, p2) {
         if (typeof(p1) !== 'object' || length(p1) != 2) throw new Error('p1 is not 1x2 element array');
         if (typeof(p2) !== 'object' || length(p2) != 2) throw new Error('p2 is not 1x2 element array');
-        this.p1 = p1;
-        this.p2 = p2;
+        this.p1 = p1.slice(0);
+        this.p2 = p2.slice(0);
     };
 
     Segment.prototype.intersect = function(that) {
         if (typeof(that) === 'Segment') {
-            // TODO: implement this feature
+            var l1 = this.toLine();
+            var l2 = that.toLine();
+            if (l1.distance(that.p1)*l1.distance(that.p2) <= 0 &&
+                l2.distance(this.p1)*l2.distance(this.p2) <= 0)
+                return l1.intersect(l2);
+            else return null;
         } else if (typeof(that) === 'Line')
             if (that.distance(this.p1)*that.distance(this.p2) <= 0 )
                 return that.intersect(new Line({p1: this.p1, p2: this.p2}));
             else return null;
         else throw new Error('unsupported type');
+    };
+
+    Segment.prototype.toLine = function () {
+        return new Line({p1: this.p1, p2: this.p2});
     };
 
     var geom = {};
