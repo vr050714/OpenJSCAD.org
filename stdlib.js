@@ -425,6 +425,12 @@ module.std = {
         return this.norm[0]*p[0]+this.norm[1]*p[1]-this.dist;
     };
 
+    Line.prototype.projection = function(p) {
+        if (typeof(p) !== 'object' && length(p) != 2) throw new Error('p is not 1x2 element array');
+        var s = this.norm[0]*p[0]+this.norm[1]*p[1]-this.dist;
+        return [p[0]-s*this.norm[0], p[1]-s*this.norm[1]];
+    };
+
     var Segment = function(p1, p2) {
         if (typeof(p1) !== 'object' || length(p1) != 2) throw new Error('p1 is not 1x2 element array');
         if (typeof(p2) !== 'object' || length(p2) != 2) throw new Error('p2 is not 1x2 element array');
