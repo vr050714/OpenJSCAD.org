@@ -84,6 +84,10 @@ var Arc = function(prm) {
 		if (typeof(prm['p2']) !== 'object' || prm['p2'].length != 2) throw new Error('p2 is not 1x2 array');
 		if (typeof(prm['p3']) !== 'object' || prm['p3'].length != 2) throw new Error('p3 is not 1x2 array');
 
+		var p1 = prm['p1'];
+		var p2 = prm['p2'];
+		var p3 = prm['p3'];
+		
 		var det3x3 = function(a,b,c) {
 			return a[0]*b[1]*c[2]+a[2]*b[0]*c[1]+a[1]*b[2]*c[0]
 			      -a[2]*b[1]*c[0]-a[1]*b[0]*c[2]-a[0]*b[2]*c[1];
@@ -134,7 +138,7 @@ var Arc = function(prm) {
 		var dpx = p2[0] - p1[0];
 		var dpy = p2[1] - p1[1];
 		var h = Math.sqrt(dpx*dpx+dpy*dpy);
-		var s = 0.5 * b * h;
+		var s = 0.5 * bulge * h;
 		var nx =  dpy/h;
 		var ny = -dpx/h;
 		
@@ -145,15 +149,15 @@ var Arc = function(prm) {
 			p3: p2
 		});
 		
-	} else if (Object.keys(prm).length == 5 && 'center' in prm && 'r' in prm && 'start' in prm && 'end' in prm && 'isccw' in prm) {
+	} else if (Object.keys(prm).length == 5 && 'center' in prm && 'radius' in prm && 'start' in prm && 'end' in prm && 'isccw' in prm) {
 		if (typeof(prm['center']) !== 'object' || prm['center'].length != 2) throw new Error('center is not 1x2 array');
-		if (typeof(prm['r']) !== 'number') throw new Error('r is not a number');
+		if (typeof(prm['radius']) !== 'number') throw new Error('radius is not a number');
 		if (typeof(prm['start']) !== 'number') throw new Error('start is not a number');
 		if (typeof(prm['end']) !== 'number') throw new Error('end is not a number');
 		if (typeof(prm['isccw']) !== 'boolean') throw new Error('end is not a number');
 
 		var p0 = prm['center'];
-		var r = prm['r'];
+		var r = prm['radius'];
 		if (r <= 0) throw new Error('radius is not a positive number');
 		var isccw = prm['isccw'];
 		var phi1 = prm['start'];
@@ -200,7 +204,7 @@ Arc.prototype = {
 		var N = Math.ceil(theta/dphi)+1;
 		
 		var n, pts = [], px, py, phi, phi0;
-		if (isccw) {
+		if (this.isCCW) {
 			dphi = theta/(N-1);
 			phi0 = this.StartAngle;
 		} else {
