@@ -78,6 +78,17 @@ Segment.prototype = {
 	}
 };
 
+/**
+ * Creates object representing arc properties
+ *
+ * Arc({p1:[1,0], p2:[0,1], p3:[-1,0]})
+ * Arc({p1:[1,0], p2:[-1,0], bulge:1})
+ * Arc({center: [0,0], radius: 1, start: 0, end: Math.PI/2, isccw: true})
+ *
+ * @param prm
+ * @returns {Arc}
+ * @constructor
+ */
 var Arc = function(prm) {
 	if (Object.keys(prm).length == 3 && 'p1' in prm && 'p2' in prm && 'p3' in prm) {
 		if (typeof(prm['p1']) !== 'object' || prm['p1'].length != 2) throw new Error('p1 is not 1x2 array');
@@ -118,8 +129,8 @@ var Arc = function(prm) {
 		}
 		if (phi2<phi1) phi2 += 2.0 * Math.PI;
 		
-		this.StartPoint = p1;
-		this.EndPoint = p3;
+		this.StartPoint = p1.slice(0);
+		this.EndPoint = p3.slice(0);
 		this.Center = [x0, y0];
 		this.Radius = r;
 		this.isCCW = isccw;
