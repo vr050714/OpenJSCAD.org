@@ -232,8 +232,61 @@ Arc.prototype = {
 	}
 };
 
+function createCuttingObject(p) {
+    /*
+     Creates printable cylinder without overhanging faces.
+     Parameters:
+     style: 'octagon', 'corner', 'flat'
+     diameter: diameter of the hole
+     resolution: resolution of the circle
+     */
+    if (typeof p === 'undefined') p = {};
+
+    var d = 'diameter' in p ? p['diameter'] : 8;
+    var CutStyle = 'style' in p ? p['style'] : 'flat';
+    var Resolution = 'resolution' in p ? p['resolution'] : 64;
+
+    var Points = [];
+    var phi = 0;
+    var R = 0;
+    var n = 0;
+
+    switch (CutStyle) {
+        case 'octagon':
+            R = 0.5 * d / Math.cos(Math.PI / 8.0);
+            for (n = 0; n < 8; n++) {
+                phi = -7.0 * Math.PI / 8.0 + n * Math.PI / 4.0;
+                Points.push([R * Math.cos(phi), R * Math.sin(phi)]);
+            }
+            break;
+        case 'corner':
+            Resolution = 3 * Math.ceil(Resolution / 4.0);
+            R = 0.5 * d / Math.cos(0.75 * Math.PI / Resolution);
+            for (n = 0; n < Resolution; n++) {
+                phi = -0.75 * Math.PI + (n + 0.5) * 1.5 * Math.PI / Resolution;
+                Points.push([R * Math.cos(phi), R * Math.sin(phi)]);
+            }
+            Points.push([-R * Math.sqrt(2), 0]);
+            break;
+        default:
+            Resolution = 3 * Math.ceil(Resolution / 4.0);
+            R = 0.5 * d / Math.cos(0.75 * Math.PI / Resolution);
+            for (n = 0; n < Resolution; n++) {
+                phi = -0.75 * Math.PI + (n + 0.5) * 1.5 * Math.PI / Resolution;
+                Points.push([R * Math.cos(phi), R * Math.sin(phi)]);
+            }
+            R = 0.5 * d / Math.cos(Math.PI / 8.0);
+            phi = 7.0 * Math.PI / 8.0;
+            Points.push([R * Math.cos(phi), R * Math.sin(phi)]);
+            phi = -7.0 * Math.PI / 8.0;
+            Points.push([R * Math.cos(phi), R * Math.sin(phi)]);
+            break;
+    }
+    return Points;
+}
+
 module.geom = {
-	
+
 	line: function(prm) {
 		return new Line(prm);
 	},
@@ -244,7 +297,35 @@ module.geom = {
 	
 	arc: function(prm) {
 		return new Arc(prm);
+	},
+
+	octagon: function (d) {
+		var p = {};
+		p.style = 'octagon';
+		if (typeof d === 'undefined')
+			throw new Error('input argument "d" is undefined');
+		p.diameter = d;
+		return createCuttingObject(p);
+	},
+
+	drop: function (d) {
+		var p = {};
+		p.style = 'corner';
+		if (typeof d === 'undefined')
+			throw new Error('input argument "d" is undefined');
+		p.diameter = d;
+		return createCuttingObject(p);
+	},
+
+	flat: function (d) {
+		var p = {};
+		p.style = 'flat';
+		if (typeof d === 'undefined')
+			throw new Error('input argument "d" is undefined');
+		p.diameter = d;
+		return createCuttingObject(p);
 	}
+
 };
 
 }(this));
