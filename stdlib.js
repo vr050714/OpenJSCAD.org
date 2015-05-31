@@ -15,45 +15,19 @@ module.std = {
         },
 
         /* ISO 7089 */
-        M2: function () {
-            return this.create(2.2, 5, 0.3);
-        },
-        M2p5: function () {
-            return this.create(2.7, 6, 0.5);
-        },
-        M2p6: function () {
-            return this.create(2.8, 7, 0.5);
-        },
-        M3: function () {
-            return this.create(3.2, 7, 0.5);
-        },
-        M3p5: function () {
-            return this.create(3.7, 8, 0.5);
-        },
-        M4: function () {
-            return this.create(4.3, 9, 0.8);
-        },
-        M5: function () {
-            return this.create(5.3, 10, 1.0);
-        },
-        M6: function () {
-            return this.create(6.4, 12, 1.6);
-        },
-        M7: function () {
-            return this.create(7.4, 14, 1.6);
-        },
-        M8: function () {
-            return this.create(8.4, 16, 1.6);
-        },
-        M10: function () {
-            return this.create(10.5, 20, 2.0);
-        },
-        M12: function () {
-            return this.create(13.0, 24, 2.5);
-        },
-        M14: function () {
-            return this.create(15.0, 28, 2.5);
-        }
+        M2:   function () { return this.create(2.2, 5, 0.3); },
+        M2p5: function () { return this.create(2.7, 6, 0.5); },
+        M2p6: function () { return this.create(2.8, 7, 0.5); },
+        M3:   function () { return this.create(3.2, 7, 0.5); },
+        M3p5: function () { return this.create(3.7, 8, 0.5); },
+        M4:   function () { return this.create(4.3, 9, 0.8); },
+        M5:   function () { return this.create(5.3, 10, 1.0); },
+        M6:   function () { return this.create(6.4, 12, 1.6); },
+        M7:   function () { return this.create(7.4, 14, 1.6); },
+        M8:   function () { return this.create(8.4, 16, 1.6); },
+        M10:  function () { return this.create(10.5, 20, 2.0); },
+        M12:  function () { return this.create(13.0, 24, 2.5); },
+        M14:  function () { return this.create(15.0, 28, 2.5); }
     },
 
     nut: {
@@ -71,39 +45,17 @@ module.std = {
         },
 
         /* ISO 4032 */
-        M2: function () {
-            return this.create(2.0, 4.0, 1.6);
-        },
-        M2p5: function () {
-            return this.create(2.5, 5.0, 2.0);
-        },
-        M3: function () {
-            return this.create(3.0, 5.5, 2.4);
-        },
-        M3p5: function () {
-            return this.create(3.5, 6.0, 2.8);
-        },
-        M4: function () {
-            return this.create(4.0, 7.0, 3.2);
-        },
-        M5: function () {
-            return this.create(5.0, 8.0, 4.7);
-        },
-        M6: function () {
-            return this.create(6.0, 10.0, 5.2);
-        },
-        M8: function () {
-            return this.create(8.0, 13.0, 6.8);
-        },
-        M10: function () {
-            return this.create(10.0, 16.0, 8.4);
-        },
-        M12: function () {
-            return this.create(12.0, 18.0, 10.8);
-        },
-        M14: function () {
-            return this.create(14.0, 21.0, 12.8);
-        }
+        M2:   function () { return this.create(2.0, 4.0, 1.6); },
+        M2p5: function () { return this.create(2.5, 5.0, 2.0); },
+        M3:   function () { return this.create(3.0, 5.5, 2.4); },
+        M3p5: function () { return this.create(3.5, 6.0, 2.8); },
+        M4:   function () { return this.create(4.0, 7.0, 3.2); },
+        M5:   function () { return this.create(5.0, 8.0, 4.7); },
+        M6:   function () { return this.create(6.0, 10.0, 5.2); },
+        M8:   function () { return this.create(8.0, 13.0, 6.8); },
+        M10:  function () { return this.create(10.0, 16.0, 8.4); },
+        M12:  function () { return this.create(12.0, 18.0, 10.8); },
+        M14:  function () { return this.create(14.0, 21.0, 12.8); }
     },
 
     bolt: {
@@ -177,32 +129,16 @@ module.std = {
          *   DD - motor size
          *   LL - motor length
          */
-        nema14: function () {
-            return this.createNEMA(35.3, 26.0, 22.0, 2.0, 5.0, 24.0, 26.0, 3, 3.5);
-        },
-        nema17: function () {
-            return this.nema1719();
-        },
+        nema14: function () { return this.createNEMA(35.3, 26.0, 22.0, 2.0, 5.0, 24.0, 26.0, 3, 3.5); },
+        nema17: function () { return this.nema1719(); },
 
-        nema1713: function () {
-            return this.createNEMA(42.3, 33.0, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5);
-        },
-        nema1715: function () {
-            return this.createNEMA(42.3, 38.1, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5);
-        },
-        nema1719: function () {
-            return this.createNEMA(42.3, 48.3, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5);
-        },
+        nema1713: function () { return this.createNEMA(42.3, 33.0, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5); },
+        nema1715: function () { return this.createNEMA(42.3, 38.1, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5); },
+        nema1719: function () { return this.createNEMA(42.3, 48.3, 22.0, 2.0, 5.0, 24.0, 31.0, 3, 4.5); },
 
-        nema2318: function () {
-            return this.createNEMA(56.4, 45.7, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0);
-        },
-        nema2322: function () {
-            return this.createNEMA(56.4, 55.9, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0);
-        },
-        nema2331: function () {
-            return this.createNEMA(56.4, 78.7, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0);
-        }
+        nema2318: function () { return this.createNEMA(56.4, 45.7, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0); },
+        nema2322: function () { return this.createNEMA(56.4, 55.9, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0); },
+        nema2331: function () { return this.createNEMA(56.4, 78.7, 38.1, 1.6, 6.4, 20.6, 47.1, 5, 5.0); }
     },
 
     gear: {
@@ -353,94 +289,6 @@ module.std = {
 
             return result.extrude({offset: [0, 0, thickness]});
         }
-    },
-
-    hole: {
-        createCuttingObject: function (p) {
-            /*
-             Creates printable cylinder without overhanging faces.
-             Parameters:
-                     style: 'octagon', 'corner', 'flat'
-                     depth: depth of the hole
-                  diameter: diameter of the hole
-                resolution: resolution of the circle
-             */
-            if (typeof p === 'undefined') p = {};
-
-            var Depth      = 'depth'      in p ? p['depth']      : 100;
-            var d          = 'diameter'   in p ? p['diameter']   : 8;
-            var CutStyle   = 'style'      in p ? p['style']      : 'flat';
-            var Resolution = 'resolution' in p ? p['resolution'] : 64;
-
-            var Points = [];
-            var phi = 0;
-            var R = 0;
-            var n = 0;
-
-            switch (CutStyle) {
-                case 'octagon':
-                    R = 0.5 * d / Math.cos(Math.PI / 8.0);
-                    for (n = 0; n<8; n++) {
-                        phi = - 7.0 * Math.PI / 8.0 + n * Math.PI / 4.0;
-                        Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
-                    }
-                    break;
-                case 'corner':
-                    Resolution = 3 * Math.ceil(Resolution / 4.0);
-                    R = 0.5 * d / Math.cos(0.75 * Math.PI / Resolution);
-                    for (n = 0; n < Resolution; n++) {
-                        phi = - 0.75 * Math.PI + (n + 0.5) * 1.5 * Math.PI / Resolution;
-                        Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
-                    }
-                    Points.push([-R * Math.sqrt(2), 0]);
-                    break;
-                default:
-                    Resolution = 3 * Math.ceil(Resolution / 4.0);
-                    R = 0.5 * d / Math.cos(0.75 * Math.PI / Resolution);
-                    for (n = 0; n < Resolution; n++) {
-                        phi = - 0.75 * Math.PI + (n + 0.5) * 1.5 * Math.PI / Resolution;
-                        Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
-                    }
-                    R = 0.5 * d / Math.cos(Math.PI / 8.0);
-                    phi = 7.0 * Math.PI / 8.0;
-                    Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
-                    phi = -7.0 * Math.PI / 8.0;
-                    Points.push([R*Math.cos(phi), R*Math.sin(phi)]);
-                    break;
-            }
-            return CAG.fromPoints(Points).extrude({offset:[0,0,Depth]}).rotateY(90);
-        },
-
-        octagon: function(d, h) {
-            var p = {};
-            p.style = 'octagon';
-            if (typeof d === 'undefined')
-                throw new Error('input argument "d" is undefined');
-            p.diameter = d;
-            if (typeof h !== 'undefined') p.depth = h;
-            return this.createCuttingObject(p);
-        },
-
-        drop: function(d, h) {
-            var p = {};
-            p.style = 'corner';
-            if (typeof d === 'undefined')
-                throw new Error('input argument "d" is undefined');
-            p.diameter = d;
-            if (typeof h !== 'undefined') p.depth = h;
-            return this.createCuttingObject(p);
-        },
-
-        flat: function(d, h) {
-            var p = {};
-            p.style = 'flat';
-            if (typeof d === 'undefined')
-                throw new Error('input argument "d" is undefined');
-            p.diameter = d;
-            if (typeof h !== 'undefined') p.depth = h;
-            return this.createCuttingObject(p);
-        }
-
     }
 
     /*
@@ -448,4 +296,4 @@ module.std = {
      */
 };
 
-})(this);
+}(this));

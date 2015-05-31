@@ -25,7 +25,7 @@ OpenJsCad.log = function(txt) {
 
 // A viewer is a WebGL canvas that lets the user view a mesh. The user can
 // tumble it around by dragging the mouse.
-OpenJsCad.Viewer = function(containerelement, initialdepth) {
+OpenJsCad.Viewer = function(containerelement, width, height, initialdepth) {
   var gl = GL.create();
   this.gl = gl;
   this.angleX = -60;
@@ -54,20 +54,20 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
   this.lineOverlay = false;
 
   // Set up the viewport
-  this.gl.canvas.width  = $(containerelement).width();
-  this.gl.canvas.height = $(containerelement).height();
-  this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-  this.gl.matrixMode(this.gl.PROJECTION);
-  this.gl.loadIdentity();
-  this.gl.perspective(45, this.gl.canvas.width / this.gl.canvas.height, 0.5, 1000);
-  this.gl.matrixMode(this.gl.MODELVIEW);
+  gl.canvas.width = width;
+  gl.canvas.height = height;
+  gl.viewport(0, 0, width, height);
+  gl.matrixMode(gl.PROJECTION);
+  gl.loadIdentity();
+  gl.perspective(45, width / height, 0.5, 1000);
+  gl.matrixMode(gl.MODELVIEW);
 
   // Set up WebGL state
-  this.gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  this.gl.clearColor(0.93, 0.93, 0.93, 1);
-  this.gl.enable(this.gl.DEPTH_TEST);
-  this.gl.enable(this.gl.CULL_FACE);
-  this.gl.polygonOffset(1, 1);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.clearColor(0.93, 0.93, 0.93, 1);
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+  gl.polygonOffset(1, 1);
 
   // Black shader for wireframe
   this.blackShader = new GL.Shader('\
@@ -114,7 +114,7 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
     <div class="arrow arrow-bottom" /></div>');
   this.touch.shiftControl = shiftControl;
 
-  $(containerelement).append(this.gl.canvas)
+  $(containerelement).append(gl.canvas)
     .append(shiftControl)
     .hammer({//touch screen control
       drag_lock_to_axis: true
@@ -170,33 +170,20 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
       _this.touch.scale = 0;
     });
 
-  this.gl.onmousemove = function(e) {
+  gl.onmousemove = function(e) {
     _this.onMouseMove(e);
   };
-
-  this.gl.ondraw = function() {
+  gl.ondraw = function() {
     _this.onDraw();
   };
-
-  this.gl.resizeCanvas = function() {
-    var canvasWidth  = _this.gl.canvas.clientWidth;
-    var canvasHeight = _this.gl.canvas.clientHeight;
-    if (_this.gl.canvas.width  != canvasWidth ||
-        _this.gl.canvas.height != canvasHeight) {
-      _this.gl.canvas.width  = canvasWidth;
-      _this.gl.canvas.height = canvasHeight;
-      _this.gl.viewport(0, 0, _this.gl.canvas.width, _this.gl.canvas.height);
-      _this.gl.matrixMode( _this.gl.PROJECTION );
-      _this.gl.loadIdentity();
-      _this.gl.perspective(45, _this.gl.canvas.width / _this.gl.canvas.height, 0.5, 1000 );
-      _this.gl.matrixMode( _this.gl.MODELVIEW );
-      _this.onDraw();
-    }
+  containerelement.onresize = function(e) {    // is not called
+     // var viewer = document.getElementById('viewer');
+     // fix distortion after resize of canvas
+     //gl.perspective(45, viewer.offsetWidth / viewer.offsetHeight, 0.5, 1000);
+     //_this.gl.perspective(45, containerelement.offsetWidth / containerelement.offsetHeight, 0.5, 1000);
+     alert("canvas has been resized");
   };
-  // only window resize is available, so add an event callback for the canvas
-  window.addEventListener( 'resize', this.gl.resizeCanvas );
-
-  this.gl.onmousewheel = function(e) {
+  gl.onmousewheel = function(e) {
     var wheelDelta = 0;    
     if (e.wheelDelta) {
       wheelDelta = e.wheelDelta;
@@ -211,7 +198,6 @@ OpenJsCad.Viewer = function(containerelement, initialdepth) {
       _this.setZoom(coeff);
     }
   };
-
   this.clear();
 };
 
@@ -672,7 +658,8 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
     "csg.js",
     "openjscad.js",
     "openscad.js",
-    "stdlib.js"
+    "stdlib.js",
+    "geom.js"
     //"jquery/jquery-1.9.1.js",
     //"jquery/jquery-ui.js"
   ];
@@ -969,14 +956,18 @@ OpenJsCad.Processor.prototype = {
 */    
     var viewerdiv = document.createElement("div");
     viewerdiv.className = "viewer";
-    viewerdiv.style.width = '100%';
-    viewerdiv.style.height = '100%';
+    viewerdiv.style.width = '100%'; //this.viewerwidth; // + "px";
+    viewerdiv.style.height = '100%'; //this.viewerheight; // + "px";
+    viewerdiv.style.width = screen.width;
+    viewerdiv.style.height = screen.height;
+    //viewerdiv.style.overflow = 'hidden';
+    viewerdiv.style.backgroundColor = "rgb(200,200,200)";
     this.containerdiv.appendChild(viewerdiv);
     this.viewerdiv = viewerdiv;
     try {
       //this.viewer = new OpenJsCad.Viewer(this.viewerdiv, this.viewerwidth, this.viewerheight, this.initialViewerDistance);
       //this.viewer = new OpenJsCad.Viewer(this.viewerdiv, viewerdiv.offsetWidth, viewer.offsetHeight, this.initialViewerDistance);
-      this.viewer = new OpenJsCad.Viewer(this.viewerdiv, this.initialViewerDistance);
+      this.viewer = new OpenJsCad.Viewer(this.viewerdiv, screen.width, screen.height, this.initialViewerDistance);
     } catch(e) {
       //      this.viewer = null;
       this.viewerdiv.innerHTML = "<b><br><br>Error: " + e.toString() + "</b><br><br>OpenJsCad currently requires Google Chrome or Firefox with WebGL enabled";
