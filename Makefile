@@ -1,4 +1,4 @@
-VERSION = 0.018
+VERSION = 0.3.0
 LIB = /usr/local/lib/openjscad/
 NODE_MODULES = /usr/local/lib/node_modules/
 
@@ -30,6 +30,7 @@ tests::
 	openjscad examples/example001.scad -o examples/example001-fromSCAD.jscad
 	openjscad examples/transparency.jscad -o examples/transparency.amf
 	cd examples/platonics && make
+	cd examples; openjscad globe.jscad
 	cd examples/include-test && make
 	# -- enable if you have openscad installed ('unsetenv DISPLAY' perhaps too)
 	# openscad examples/example001.scad -o examples/example001-fromSCADviaOpenSCAD.stl
@@ -50,6 +51,10 @@ push::
 	git remote set-url origin git@github.com:Spiritdude/OpenJSCAD.org.git
 	git push -u origin master
 
+push-dev::
+	git remote set-url origin git@github.com:Spiritdude/OpenJSCAD.org.git
+	git push -u origin dev
+
 pull::
 	git remote set-url origin git@github.com:Spiritdude/OpenJSCAD.org.git
 	git pull -u origin master
@@ -61,8 +66,8 @@ backup::
 	scp ../Backup/openjscad.org-${VERSION}.tar.gz the-labs.com:Backup/
 
 edit::
-	dee4 index.html Makefile README.md *.css *.js openjscad
+	dee4 index.html Makefile LICENSE README.md *.css *.js openjscad
 
 live::
-	# -- do not enable --delete is it will destroy stats folder
-	rsync -av --exclude=.git --exclude=cache/ ./ the-labs.com:Sites/openjscad.org/ 
+	# -- do not enable --delete as it will destroy stats folder
+	rsync -av --exclude=.git --exclude=cache/ ./ delta:Sites/openjscad.org/ 

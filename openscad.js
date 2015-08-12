@@ -1,7 +1,9 @@
 // openscad.js, a few functions to simplify coding OpenSCAD-like
-//    written by Rene K. Mueller <spiritdude@gmail.com>, License: GPLv2
 //
-// Version: 0.022
+// Copyright (c) 2013-2015 by Rene K. Mueller <spiritdude@gmail.com>
+//
+// Version: 0.3.0
+// License: MIT License
 //
 // Description:
 // Helping to convert OpenSCAD .scad files to OpenJSCad .jscad files with 
@@ -12,7 +14,9 @@
 //     http://openjscad.org/
 //
 // History:
-// 2014/01/07: 0.022: cylinder() supports d, d1 & d2 to be OpenSCAD-like (github issue #61)
+// 2015/05/20: 0.2.4: renumbering to 0.024 -> 0.2.4
+// 2015/02/15: 0.023: change license from GPL to MIT license, for sake of simpleness, pull request for mirror() fix (github issue #65) included
+// 2015/01/07: 0.022: cylinder() supports d, d1 & d2 to be OpenSCAD-like (github issue #61)
 // 2013/04/26: 0.021: sphere() geodesic option added
 // 2013/04/25: 0.020: center(v,obj) added, uses new .center(v)
 // 2013/04/22: 0.019: vector_char() and vector_text() added, vector font rendering
@@ -656,27 +660,15 @@ function rotate() {
    }
 }
 
-function mirror(v,o) { 
-   var a = arguments, v,o,i = 1, r = 0;
-   if(arguments.length==3) {  // mirror(r,[x,y,z],o)
-      r = a[0];
-      v = a[1];
-      i = 2;
-      if(a[2].length) { a = a[2]; i = 0; }
-      
-   } else {                   // rotate([x,y,z],o)
-      v = a[0];
-      i = 1;
-      if(a[1].length) { a = a[1]; i = 0; }
-   }
-   for(o=a[i++]; i<a.length; i++) { 
+function mirror(v,o) {
+   var a = Array.prototype.slice.call(arguments, 1, arguments.length),
+       o = a[0];
+
+   for(var i=1; i<a.length; i++) {
       o = o.union(a[i]);
-   } 
-   if(r!=1) {
-      return o.mirroredX(v[0]*r).mirroredY(v[1]*r).mirroredZ(v[2]*r);
-   } else {
-      return o.mirroredX(v[0]).mirroredY(v[1]).mirroredZ(v[2]); 
    }
+   var plane = new CSG.Plane(new CSG.Vector3D(v[0], v[1], v[2]).unit(), 0);
+   return o.mirrored(plane);
 }
 
 function expand(r,n,o) {
