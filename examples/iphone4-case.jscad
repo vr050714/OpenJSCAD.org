@@ -1,8 +1,5 @@
-// title      : iPhone 4 Dock
-// author     : Joost Nieuwenhuijse
-// license    : MIT License
-// description: iPhone 4 dock
-// file       : iphone4-case.jscad
+// title: iPhone 4 Dock
+// author: Joost Nieuwenhuijse
 
 /*
 

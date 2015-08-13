@@ -1,8 +1,4 @@
-// title      : Rounded Cube
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: testing roundedCube() function
-// file       : rounded-cube.jscad
+// title: Rounded Cube
 
 function getParameterDefinitions() {
   return [

@@ -1,11 +1,9 @@
-// title      : Example 005
-// author     : OpenSCAD.org, adapted by Rene K. Mueller
-// license    : MIT License
-// description: example005.scad ported to OpenJSCAD
-// file       : example005.jscad
+// title: Example 005
+// author: OpenSCAD.org
+// description: example001.scad ported to OpenJSCAD
 
 function example005() {
-   var cy = [];
+   var cy = new Array();
    for(var i = 0; i<=5; i++) {
       //echo(360*i/6, sin(360*i/6)*80, cos(360*i/6)*80);
       cy[i] = translate([sin(360*i/6)*80, cos(360*i/6)*80, 0 ],

@@ -1,10 +1,7 @@
-// title      : Sphere
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: testing sphere() function
-//              sphere, two kinds: 'normal' (default) and 'geodesic'
-// date       : 2013/04/26
-// file       : sphere.jscad
+// title: Sphere
+// author: Rene K. Mueller
+// date: 2013/04/26
+// description: sphere, two kinds: 'normal' (default) and 'geodesic'
 
 function main() {
    return [

@@ -1,8 +1,6 @@
-// title      : Center
-// author     : Rene K. Mueller
-// license    : MIT License
+// title: Center
+// author: Rene K. Mueller
 // description: testing all the different options of the OpenSCAD-like OpenJSCAD functions (aside of the strict object oriented approaches)
-// file       : center.jscad
 
 function main() {
    var o = [];

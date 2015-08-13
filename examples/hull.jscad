@@ -1,8 +1,7 @@
-// title      : Hull
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: testing hull() function
-// file       : hull.jscad
+// title: Hull() 
+// author: Rene K. Mueller
+// license: MIT License
+// date: 2013/04/18
 
 function showHull() {
    var o = Array.prototype.slice.call(arguments);

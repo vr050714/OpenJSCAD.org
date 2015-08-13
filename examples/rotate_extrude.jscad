@@ -1,8 +1,6 @@
-// title      : Rotate Extrude
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: testing rotate_extrude() function
-// file       : rotate_extrude.jscad
+// title: Rotate_extrude()
+// author: Rene K. Mueller
+// license: MIT License
 
 function main() {
    return [

@@ -1,9 +1,7 @@
-// title      : Vector Text Rendering
-// author     : Rene K. Mueller
-// license    : MIT License
+// title: Vector Text Rendering
+// author: Rene K. Mueller
+// date: 2013/04/22
 // description: playing with vector font
-// date       : 2013/04/22
-// file       : text.jscad
 
 function getParameterDefinitions() {
    return [

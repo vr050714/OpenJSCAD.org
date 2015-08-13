@@ -1,8 +1,6 @@
-// title      : Grille
-// author     : Joost Nieuwenhuijse
-// license    : MIT License
-// description: a grille for...
-// file       : grille.jscad
+// title: Grille
+// author: Joost Nieuwenhuijse
+// license: MIT License
 
 // Here we define the user editable parameters: 
 function getParameterDefinitions() {

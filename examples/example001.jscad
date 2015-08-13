@@ -1,8 +1,6 @@
-// title      : Example 001
-// author     : OpenSCAD.org, adapted by Rene K. Mueller
-// license    : MIT License
+// title: Example 001
+// author: OpenSCAD.org
 // description: example001.scad ported to OpenJSCAD.org
-// file       : example001.jscad
 
 function r_from_dia(d) { return d / 2; }
 

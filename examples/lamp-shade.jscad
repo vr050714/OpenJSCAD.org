@@ -1,8 +1,6 @@
-// title      : Lamp Shade
-// author     : Joost Nieuwenhuijse
-// license    : MIT License
-// description: a lamp shade
-// file       : lamp-shade.jscad
+// title: Lamp Shade
+// author: Joost Nieuwenhuijse
+// license: MIT License
 
 function main(params)
 {

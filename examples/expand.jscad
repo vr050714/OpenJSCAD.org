@@ -1,8 +1,4 @@
-// title      : Expand
-// author     : OpenSCAD.org, adapted by Rene K. Mueller
-// license    : MIT License
-// description: testing expand() function
-// file       : expand.jscad
+// title: Expand()
 
 function main() {
    return union(

@@ -1,9 +1,7 @@
-// title      : Colors
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: testing hull() function
-// tags       : RGB, RGBA
-// file       : hull.jscad
+// title: Colors
+// author: Rene K. Mueller
+// license: MIT License
+// tags: RGB, RGBA
 
 function spread() {
    var a = Array.prototype.slice.call(arguments);

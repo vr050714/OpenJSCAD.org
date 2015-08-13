@@ -1,8 +1,6 @@
-// title      : Example 004
-// author     : OpenSCAD.org, adapted by Rene K. Mueller
-// license    : MIT License
-// description: example004.scad ported to OpenJSCAD.org
-// file       : example004.jscad
+// title: Example 004
+// author: OpenSCAD.org
+// description: example001.scad ported to OpenJSCAD.org
 
 function example004() {
 	return difference(

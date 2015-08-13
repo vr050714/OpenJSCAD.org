@@ -1,8 +1,5 @@
-// title      : Polyhedron
-// author     : OpenSCAD.org, adapted by Rene K. Mueller
-// license    : MIT License
-// description: testing polyhedron() function
-// file       : polyhedron.jscad
+// title: Polyhedron()
+// author: OpenSCAD.org, adapted by Rene K. Mueller
 
 function main() {
    return polyhedron({ 

@@ -1,8 +1,6 @@
-// title      : Gear
-// author     : Joost Nieuwenhuijse
-// license    : MIT License
-// description: a simple gear
-// file       : gear.jscad
+// title: Gear
+// author: Joost Nieuwenhuijse
+// license: MIT License
 
 // Here we define the user editable parameters: 
 function getParameterDefinitions() {

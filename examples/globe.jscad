@@ -1,9 +1,8 @@
-// title      : World
-// author     : Derrick Oswald
-// license    : Public Domain
+// title: World
+// author: Derrick Oswald
+// license: Public Domain
+// date: 22.12.2013
 // description: a globe
-// date       : 22.12.2013
-// file       : globe.jscad
 
 include ("platonics/maths_geodesic.jscad");
 

@@ -1,9 +1,7 @@
-// title      : Simplex Vector Font
-// author     : Rene K. Mueller
-// license    : MIT License
+// title: Simplex Vector Font
+// author: Rene K. Mueller
+// date: 2013/04/20
 // description: playing with vector font
-// date       : 2013/04/20
-// file       : simplex.jscad
 
 var o = [];
 

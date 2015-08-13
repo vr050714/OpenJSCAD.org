@@ -1,8 +1,6 @@
-// title      : Example 002
-// author     : OpenSCAD.org, adapted by Rene K. Mueller
-// license    : MIT License
-// description: example002.scad ported to OpenJSCAD.org
-// file       : example002.jscad
+// title: Example 002
+// author: OpenSCAD.org
+// description: example001.scad ported to OpenJSCAD.org
 
 function example002() {
 	return intersection(

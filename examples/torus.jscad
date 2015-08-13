@@ -1,8 +1,6 @@
-// title      : Torus()
-// author     : Rene K. Mueller
-// license    : MIT License
-// description: testing torus() function
-// file       : torus.jscad
+// title: Torus()
+// author: Rene K. Mueller
+// license: MIT License
 
 function main() {
    return [
