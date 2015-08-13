@@ -676,7 +676,8 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
   var baselibraries = [
     "csg.js",
     "openjscad.js",
-    "openscad.js"
+    "openscad.js",
+	"geom.js"
     //"jquery/jquery-1.9.1.js",
     //"jquery/jquery-ui.js"
   ];

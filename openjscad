@@ -55,6 +55,7 @@ if (!fs.existsSync(global.lib))           // requires node 0.10.1
 var CSG  = require(lib+'./formats.js').CSG; // use the CSG with extended prototypes
 var CAG  = require(lib+'./formats.js').CAG; // use the CAG with extended prototypes
 var Blob = require(lib+'./Blob.js').Blob;
+var geom = require(lib+'./geom.js').geom;
 
 //require(lib+'./OpenJsCad/openjscad.js'); // make it a nodejs module (later)
 
