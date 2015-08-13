@@ -299,6 +299,11 @@ module.geom = {
 		return new Arc(prm);
 	},
 
+	/*
+	 "octagon", "drop", "flat" are patterns that can be used for cutting printable holes when the axis of the hole
+	 lies in horizontal plane.
+	 d - diameter of the inscribed circle
+	 */
 	octagon: function (d) {
 		var p = {};
 		p.style = 'octagon';

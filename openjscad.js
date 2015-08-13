@@ -25,7 +25,7 @@ OpenJsCad.log = function(txt) {
 
 // A viewer is a WebGL canvas that lets the user view a mesh. The user can
 // tumble it around by dragging the mouse.
-OpenJsCad.Viewer = function(containerelement, width, height, initialdepth) {
+OpenJsCad.Viewer = function(containerelement, initialdepth) {
   var gl = GL.create();
   this.gl = gl;
   this.angleX = -60;
@@ -54,20 +54,20 @@ OpenJsCad.Viewer = function(containerelement, width, height, initialdepth) {
   this.lineOverlay = false;
 
   // Set up the viewport
-  gl.canvas.width = width;
-  gl.canvas.height = height;
-  gl.viewport(0, 0, width, height);
-  gl.matrixMode(gl.PROJECTION);
-  gl.loadIdentity();
-  gl.perspective(45, width / height, 0.5, 1000);
-  gl.matrixMode(gl.MODELVIEW);
+  this.gl.canvas.width  = $(containerelement).width();
+  this.gl.canvas.height = $(containerelement).height();
+  this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+  this.gl.matrixMode(this.gl.PROJECTION);
+  this.gl.loadIdentity();
+  this.gl.perspective(45, this.gl.canvas.width / this.gl.canvas.height, 0.5, 1000);
+  this.gl.matrixMode(this.gl.MODELVIEW);
 
   // Set up WebGL state
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  gl.clearColor(0.93, 0.93, 0.93, 1);
-  gl.enable(gl.DEPTH_TEST);
-  gl.enable(gl.CULL_FACE);
-  gl.polygonOffset(1, 1);
+  this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+  this.gl.clearColor(0.93, 0.93, 0.93, 1);
+  this.gl.enable(this.gl.DEPTH_TEST);
+  this.gl.enable(this.gl.CULL_FACE);
+  this.gl.polygonOffset(1, 1);
 
   // Black shader for wireframe
   this.blackShader = new GL.Shader('\
@@ -114,7 +114,7 @@ OpenJsCad.Viewer = function(containerelement, width, height, initialdepth) {
     <div class="arrow arrow-bottom" /></div>');
   this.touch.shiftControl = shiftControl;
 
-  $(containerelement).append(gl.canvas)
+  $(containerelement).append(this.gl.canvas)
     .append(shiftControl)
     .hammer({//touch screen control
       drag_lock_to_axis: true
@@ -170,20 +170,33 @@ OpenJsCad.Viewer = function(containerelement, width, height, initialdepth) {
       _this.touch.scale = 0;
     });
 
-  gl.onmousemove = function(e) {
+  this.gl.onmousemove = function(e) {
     _this.onMouseMove(e);
   };
-  gl.ondraw = function() {
+
+  this.gl.ondraw = function() {
     _this.onDraw();
   };
-  containerelement.onresize = function(e) {    // is not called
-     // var viewer = document.getElementById('viewer');
-     // fix distortion after resize of canvas
-     //gl.perspective(45, viewer.offsetWidth / viewer.offsetHeight, 0.5, 1000);
-     //_this.gl.perspective(45, containerelement.offsetWidth / containerelement.offsetHeight, 0.5, 1000);
-     alert("canvas has been resized");
+
+  this.gl.resizeCanvas = function() {
+    var canvasWidth  = _this.gl.canvas.clientWidth;
+    var canvasHeight = _this.gl.canvas.clientHeight;
+    if (_this.gl.canvas.width  != canvasWidth ||
+        _this.gl.canvas.height != canvasHeight) {
+      _this.gl.canvas.width  = canvasWidth;
+      _this.gl.canvas.height = canvasHeight;
+      _this.gl.viewport(0, 0, _this.gl.canvas.width, _this.gl.canvas.height);
+      _this.gl.matrixMode( _this.gl.PROJECTION );
+      _this.gl.loadIdentity();
+      _this.gl.perspective(45, _this.gl.canvas.width / _this.gl.canvas.height, 0.5, 1000 );
+      _this.gl.matrixMode( _this.gl.MODELVIEW );
+      _this.onDraw();
+    }
   };
-  gl.onmousewheel = function(e) {
+  // only window resize is available, so add an event callback for the canvas
+  window.addEventListener( 'resize', this.gl.resizeCanvas );
+
+  this.gl.onmousewheel = function(e) {
     var wheelDelta = 0;    
     if (e.wheelDelta) {
       wheelDelta = e.wheelDelta;
@@ -198,6 +211,7 @@ OpenJsCad.Viewer = function(containerelement, width, height, initialdepth) {
       _this.setZoom(coeff);
     }
   };
+
   this.clear();
 };
 
@@ -226,6 +240,11 @@ OpenJsCad.Viewer.prototype = {
   ZOOM_MIN: 10,
   onZoomChanged: null,
   plate: true,                   // render plate
+  // state of view
+  // 0 - initialized, no object
+  // 1 - cleared, no object
+  // 2 - showing, object
+  state: 0,
 
   setZoom: function(coeff) { //0...1
     coeff=Math.max(coeff, 0);
@@ -658,8 +677,7 @@ OpenJsCad.parseJsCadScriptASync = function(script, mainParameters, options, call
     "csg.js",
     "openjscad.js",
     "openscad.js",
-    "stdlib.js",
-    "geom.js"
+	"geom.js"
     //"jquery/jquery-1.9.1.js",
     //"jquery/jquery-ui.js"
   ];
@@ -898,9 +916,7 @@ OpenJsCad.Processor = function(containerdiv, onchange) {
   //this.viewerwidth = 1200;
   //this.viewerheight = 800;
   this.initialViewerDistance = 100;
-  this.processing = false;
   this.currentObject = null;
-  this.hasValidCurrentObject = false;
   this.hasOutputFile = false;
   this.worker = null;
   this.paramDefinitions = [];
@@ -910,6 +926,12 @@ OpenJsCad.Processor = function(containerdiv, onchange) {
   this.debugging = false;
   this.options = {};
   this.createElements();
+// state of the processor
+// 0 - initialized - no viewer, no parameters, etc
+// 1 - processing  - processing JSCAD script
+// 2 - complete    - completed processing
+// 3 - incomplete  - incompleted due to errors in processing
+  this.state = 0; // initialized
 };
 
 OpenJsCad.Processor.convertToSolid = function(obj) {
@@ -956,22 +978,16 @@ OpenJsCad.Processor.prototype = {
 */    
     var viewerdiv = document.createElement("div");
     viewerdiv.className = "viewer";
-    viewerdiv.style.width = '100%'; //this.viewerwidth; // + "px";
-    viewerdiv.style.height = '100%'; //this.viewerheight; // + "px";
-    viewerdiv.style.width = screen.width;
-    viewerdiv.style.height = screen.height;
-    //viewerdiv.style.overflow = 'hidden';
-    viewerdiv.style.backgroundColor = "rgb(200,200,200)";
+    viewerdiv.style.width = '100%';
+    viewerdiv.style.height = '100%';
     this.containerdiv.appendChild(viewerdiv);
     this.viewerdiv = viewerdiv;
     try {
       //this.viewer = new OpenJsCad.Viewer(this.viewerdiv, this.viewerwidth, this.viewerheight, this.initialViewerDistance);
       //this.viewer = new OpenJsCad.Viewer(this.viewerdiv, viewerdiv.offsetWidth, viewer.offsetHeight, this.initialViewerDistance);
-      this.viewer = new OpenJsCad.Viewer(this.viewerdiv, screen.width, screen.height, this.initialViewerDistance);
+      this.viewer = new OpenJsCad.Viewer(this.viewerdiv, this.initialViewerDistance);
     } catch(e) {
-      //      this.viewer = null;
       this.viewerdiv.innerHTML = "<b><br><br>Error: " + e.toString() + "</b><br><br>OpenJsCad currently requires Google Chrome or Firefox with WebGL enabled";
-      //      this.viewerdiv.innerHTML = e.toString();
     }
     //Zoom control
     if(0) {
@@ -1091,10 +1107,10 @@ OpenJsCad.Processor.prototype = {
     if(this.viewer) {
       var csg = OpenJsCad.Processor.convertToSolid(obj);       // enfore CSG to display
       this.viewer.setCsg(csg);
+      this.viewer.state = 2;
       if(obj.length)             // if it was an array (multiple CSG is now one CSG), we have to reassign currentObject
          this.currentObject = csg;
     }
-    this.hasValidCurrentObject = true;
     
     while(this.formatDropdown.options.length > 0)
       this.formatDropdown.options.remove(0);
@@ -1125,27 +1141,31 @@ OpenJsCad.Processor.prototype = {
   
   clearViewer: function() {
     this.clearOutputFile();
-    this.setCurrentObject(new CSG());
-    this.hasValidCurrentObject = false;
+    if (this.currentObject) {
+      this.setCurrentObject(new CSG());
+      this.currentObject = null;
+    }
+    this.viewer.state = 1; // cleared
     this.enableItems();
   },
   
   abort: function() {
-    if(this.processing)
+  // abort if state is processing
+    if(this.state == 1)
     {
       //todo: abort
-      this.processing=false;
       this.statusspan.innerHTML = "Aborted.";
       this.worker.terminate();
+      this.state = 3; // incomplete
       this.enableItems();
       if(this.onchange) this.onchange();
     }
   },
   
   enableItems: function() {
-    this.abortbutton.style.display = this.processing? "inline":"none";
-    this.formatDropdown.style.display = ((!this.hasOutputFile)&&(this.hasValidCurrentObject))? "inline":"none";
-    this.generateOutputFileButton.style.display = ((!this.hasOutputFile)&&(this.hasValidCurrentObject))? "inline":"none";
+    this.abortbutton.style.display = (this.state == 1) ? "inline":"none";
+    this.formatDropdown.style.display = ((!this.hasOutputFile)&&(this.currentObject))? "inline":"none";
+    this.generateOutputFileButton.style.display = ((!this.hasOutputFile)&&(this.currentObject))? "inline":"none";
     this.downloadOutputFileLink.style.display = this.hasOutputFile? "inline":"none";
     this.parametersdiv.style.display = (this.paramControls.length > 0)? "inline-block":"none";     // was 'block' 
     this.errordiv.style.display = this.hasError? "block":"none";
@@ -1179,7 +1199,6 @@ OpenJsCad.Processor.prototype = {
     if(!filename) filename = "openjscad.jscad";
     filename = filename.replace(/\.jscad$/i, "");
     this.abort();
-    this.clearViewer();
     this.paramDefinitions = [];
     this.paramControls = [];
     this.script = null;
@@ -1256,7 +1275,6 @@ OpenJsCad.Processor.prototype = {
     this.abort();
     this.setError("");
     this.clearViewer();
-    this.processing = true;
     this.statusspan.innerHTML = "Rendering code, please wait <img id=busy src='imgs/busy.gif'>";
     this.enableItems();
     var that = this;
@@ -1269,18 +1287,20 @@ OpenJsCad.Processor.prototype = {
       try
       {
           console.log("trying async compute");
+          that.state = 1; // processing
           this.worker = OpenJsCad.parseJsCadScriptASync(this.script, paramValues, this.options, function(err, obj) {
-          that.processing = false;
           that.worker = null;
           if(err)
           {
             that.setError(err);
             that.statusspan.innerHTML = "Error.";
+            that.state = 3; // incomplete
           }
           else
           {
             that.setCurrentObject(obj);
             that.statusspan.innerHTML = "Ready.";
+            that.state = 2; // complete
           }
           that.enableItems();
           if(that.onchange) that.onchange();
@@ -1297,34 +1317,31 @@ OpenJsCad.Processor.prototype = {
     {
       try
       {
+        that.state = 1; // processing
         this.statusspan.innerHTML = "Rendering code, please wait <img id=busy src='imgs/busy.gif'>";
         var obj = OpenJsCad.parseJsCadScriptSync(this.script, paramValues, this.debugging);
         that.setCurrentObject(obj);
-        that.processing = false;
         that.statusspan.innerHTML = "Ready.";
+        that.state = 2; // complete
       }
       catch(e)
       {
-        that.processing = false;
         var errtxt = e.toString();
         if(e.stack) {
           errtxt += '\nStack trace:\n'+e.stack;
         } 
         that.statusspan.innerHTML = "Error.";
+        that.state = 3; // incomplete
       }
       that.enableItems();
       if(that.onchange) that.onchange();
     }
   },
   
-  hasSolid: function() {
-    return this.hasValidCurrentObject;
+  getState: function() {
+    return this.state;
   },
 
-  isProcessing: function() {
-    return this.processing;
-  },
-   
   clearOutputFile: function() {
     if(this.hasOutputFile)
     {
@@ -1346,7 +1363,7 @@ OpenJsCad.Processor.prototype = {
 
   generateOutputFile: function() {
     this.clearOutputFile();
-    if(this.hasValidCurrentObject)
+    if(this.currentObject)
     {
       try
       {
@@ -1382,7 +1399,7 @@ OpenJsCad.Processor.prototype = {
       blob = new Blob([blob],{ type: this.formatInfo(format).mimetype });
     }  
     else if(format == "x3d") {
-      blob = this.currentObject.fixTJunctions().toX3D(bb);
+      blob = this.currentObject.fixTJunctions().toX3D();
     }
     else if(format == "dxf") {
       blob = this.currentObject.toDxf();
