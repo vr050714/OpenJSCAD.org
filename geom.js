@@ -33,8 +33,7 @@ Line.prototype = {
 				return [(this.dist * that.norm[1] - that.dist * this.norm[1]) / det,
 					(this.norm[0] * that.dist - that.norm[0] * this.dist   ) / det];
 			else return null; // lines are parallel
-		} else if (that instanceof Segment)
-			return this.intersect(new Line({p1: that.p1, p2: that.p2}));
+		}
 		else throw "unsupported type";
 	},
 
@@ -50,33 +49,6 @@ Line.prototype = {
 	}
 };
 
-var Segment = function(p1, p2) {
-	if (typeof(p1) !== 'object' || p1.length != 2) throw "p1 is not 1x2 element array";
-	if (typeof(p2) !== 'object' || p2.length != 2) throw "p2 is not 1x2 element array";
-	this.p1 = p1.slice(0);
-	this.p2 = p2.slice(0);
-};
-
-Segment.prototype = {
-	intersect: function (that) {
-		if (that instanceof Segment) {
-			var l1 = this.toLine();
-			var l2 = that.toLine();
-			if (l1.distance(that.p1) * l1.distance(that.p2) <= 0 &&
-				l2.distance(this.p1) * l2.distance(this.p2) <= 0)
-				return l1.intersect(l2);
-			else return null;
-		} else if (that instanceof Line)
-			if (that.distance(this.p1) * that.distance(this.p2) <= 0)
-				return that.intersect(new geom.Line({p1: this.p1, p2: this.p2}));
-			else return null;
-		else throw "unsupported type";
-	},
-
-	toLine: function () {
-		return new geom.Line({p1: this.p1, p2: this.p2});
-	}
-};
 
 /**
  * Creates object representing arc properties
@@ -289,10 +261,6 @@ module.geom = {
 
 	line: function(prm) {
 		return new Line(prm);
-	},
-	
-	segment: function(p1, p2) {
-		return new Segment(p1, p2);
 	},
 	
 	arc: function(prm) {
