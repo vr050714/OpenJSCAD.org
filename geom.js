@@ -3,13 +3,18 @@
  * The core idea is to hide linear algebra and trigonometry in the classes and use them like ruler and compasses.
  */
 
+//TODO: Replace Line class
+//TODO: Copy over Vector2d class
+
 (function(module) {
 
 var Line = function(prm) {
-	if (typeof(prm)==='undefined') throw "parameters are undefined";
+	if (typeof(prm)==='undefined') throw new Error("parameters are undefined");
 	if ('p1' in prm && 'p2' in prm) {
-		if (typeof(prm['p1']) !== 'object' || prm['p1'].length != 2) throw "p1 is not 1x2 element array";
-		if (typeof(prm['p2']) !== 'object' || prm['p2'].length != 2) throw "p2 is not 1x2 element array";
+		if (typeof prm['p1'] !== 'object' || prm['p1'].length != 2)
+			throw new Error("p1 is not 1x2 element array");
+		if (typeof prm['p2'] !== 'object' || prm['p2'].length != 2)
+			throw new Error("p2 is not 1x2 element array");
 		var p1 = prm['p1'].slice(0);
 		var p2 = prm['p2'].slice(0);
 		var tx = p2[0]-p1[0];
@@ -18,11 +23,14 @@ var Line = function(prm) {
 		this.norm = [-ty/tn, tx/tn];
 		this.dist = this.norm[0]*p1[0]+this.norm[1]*p1[1];
 	} else if ('norm' in prm && 'dist' in prm) {
-		if (typeof(prm['norm']) !== 'object' || prm['norm'].length != 2) throw "norm is not 1x2 element array";
-		if (typeof(prm['dist']) !== 'number') throw "dist is not a number";
+		if (typeof prm['norm'] !== 'object' || prm['norm'].length != 2)
+			throw new Error("norm is not 1x2 element array");
+		if (typeof prm['dist'] !== 'number')
+			throw new Error("dist is not a number");
 		this.norm = prm['norm'].slice(0);
 		this.dist = prm['dist'];
-	} else throw "wrong parameters";
+	} else
+		throw new Error("wrong parameters");
 };
 
 Line.prototype = {
@@ -32,18 +40,21 @@ Line.prototype = {
 			if (Math.abs(det) > 1e-15)
 				return [(this.dist * that.norm[1] - that.dist * this.norm[1]) / det,
 					(this.norm[0] * that.dist - that.norm[0] * this.dist   ) / det];
-			else return null; // lines are parallel
-		}
-		else throw "unsupported type";
+			else
+				return null; // lines are parallel
+		} else
+			throw new Error("unsupported type");
 	},
 
 	distance: function (p) {
-		if (typeof(p) !== 'object' || p.length != 2) throw "p is not 1x2 element array";
+		if (typeof p !== 'object' || p.length != 2)
+			throw new Error("p is not 1x2 element array");
 		return this.norm[0] * p[0] + this.norm[1] * p[1] - this.dist;
 	},
 
 	projection: function (p) {
-		if (typeof(p) !== 'object' && p.length != 2) throw "p is not 1x2 element array";
+		if (typeof p !== 'object' && p.length != 2)
+			throw new Error("p is not 1x2 element array");
 		var s = this.norm[0] * p[0] + this.norm[1] * p[1] - this.dist;
 		return [p[0] - s * this.norm[0], p[1] - s * this.norm[1]];
 	}
@@ -63,9 +74,12 @@ Line.prototype = {
  */
 var Arc = function(prm) {
 	if (Object.keys(prm).length == 3 && 'p1' in prm && 'p2' in prm && 'p3' in prm) {
-		if (typeof(prm['p1']) !== 'object' || prm['p1'].length != 2) throw "p1 is not 1x2 array";
-		if (typeof(prm['p2']) !== 'object' || prm['p2'].length != 2) throw "p2 is not 1x2 array";
-		if (typeof(prm['p3']) !== 'object' || prm['p3'].length != 2) throw "p3 is not 1x2 array";
+		if (typeof prm['p1'] !== 'object' || prm['p1'].length != 2)
+			throw new Error("p1 is not 1x2 array");
+		if (typeof prm['p2'] !== 'object' || prm['p2'].length != 2)
+			throw new Error("p2 is not 1x2 array");
+		if (typeof prm['p3'] !== 'object' || prm['p3'].length != 2)
+			throw new Error("p3 is not 1x2 array");
 
 		var p1 = prm['p1'];
 		var p2 = prm['p2'];
@@ -111,9 +125,12 @@ var Arc = function(prm) {
 		this.Bulge = (isccw ? 1.0 : -1.0) * Math.tan((phi2-phi1)/4.0);
 		
 	} else if (Object.keys(prm).length == 3 && 'p1' in prm && 'p2' in prm && 'bulge' in prm) {
-		if (typeof(prm['p1']) !== 'object' || prm['p1'].length != 2) throw "p1 is not 1x2 array";
-		if (typeof(prm['p2']) !== 'object' || prm['p2'].length != 2) throw "p2 is not 1x2 array";
-		if (typeof(prm['bulge']) !== 'number') throw "bulge is not a number";
+		if (typeof prm['p1'] !== 'object' || prm['p1'].length != 2)
+			throw new Error("p1 is not 1x2 array");
+		if (typeof prm['p2'] !== 'object' || prm['p2'].length != 2)
+			throw new Error("p2 is not 1x2 array");
+		if (typeof prm['bulge'] !== "number")
+			throw new Error("bulge is not a number");
 		
 		var p1 = prm['p1'];
 		var p2 = prm['p2'];
@@ -133,15 +150,21 @@ var Arc = function(prm) {
 		});
 		
 	} else if (Object.keys(prm).length == 5 && 'center' in prm && 'radius' in prm && 'start' in prm && 'end' in prm && 'isccw' in prm) {
-		if (typeof(prm['center']) !== 'object' || prm['center'].length != 2) throw "center is not 1x2 array";
-		if (typeof(prm['radius']) !== 'number') throw "radius is not a number";
-		if (typeof(prm['start']) !== 'number') throw "start is not a number";
-		if (typeof(prm['end']) !== 'number') throw "end is not a number";
-		if (typeof(prm['isccw']) !== 'boolean') throw "end is not a number";
+		if (typeof prm['center'] !== 'object' || prm['center'].length != 2)
+			throw new Error("center is not 1x2 array");
+		if (typeof prm['radius'] !== 'number')
+			throw new Error("radius is not a number");
+		if (typeof prm['start'] !== 'number') 
+			throw new Error("start is not a number");
+		if (typeof prm['end'] !== 'number')
+			throw new Error("end is not a number");
+		if (typeof prm['isccw'] !== 'boolean')
+			throw new Error("end is not a number");
 
 		var p0 = prm['center'];
 		var r = prm['radius'];
-		if (r <= 0) throw "radius is not a positive number";
+		if (r <= 0)
+			throw new Error("radius is not a positive number");
 		var isccw = prm['isccw'];
 		var phi1 = prm['start'];
 		var phi2 = prm['end'];
@@ -170,17 +193,19 @@ var Arc = function(prm) {
 		this.EndAngle = phi2;
 		this.Bulge = (isccw ? 1.0 : -1.0) * Math.tan((phi2-phi1)/4.0);
 		
-	} else {
-		throw "unsupported list of parameters";
-	}
+	} else
+		throw new Error("unsupported list of parameters";
 };
 
 Arc.prototype = {
 	points: function(AbsTol) {
 		// AbsTol - maximal distance between arc and segments
-		if (typeof(AbsTol) === 'undefined') AbsTol = 0.1; // [mm], should be enough for 3D printing
-		if (typeof(AbsTol) !== 'number') throw "AbsTol is not a number";
-		if (AbsTol <= 0) throw "AbsTol is not a positive number";
+		if (typeof AbsTo === 'undefined')
+			AbsTol = 0.1; // [mm], should be enough for 3D printing
+		if (typeof AbsTol !== 'number')
+			throw new Error("AbsTol is not a number");
+		if (AbsTol <= 0)
+			throw new Error("AbsTol is not a positive number");
 		
 		var dphi = 2 * Math.acos(1-AbsTol/this.Radius);
 		var theta = this.EndAngle - this.StartAngle;
@@ -276,7 +301,7 @@ module.geom = {
 		var p = {};
 		p.style = 'octagon';
 		if (typeof d === 'undefined')
-			throw "input argument d is undefined";
+			throw new Error("input argument d is undefined");
 		p.diameter = d;
 		return createCuttingObject(p);
 	},
@@ -285,7 +310,7 @@ module.geom = {
 		var p = {};
 		p.style = 'corner';
 		if (typeof d === 'undefined')
-			throw "input argument d is undefined";
+			throw new Error("input argument d is undefined");
 		p.diameter = d;
 		return createCuttingObject(p);
 	},
@@ -294,7 +319,7 @@ module.geom = {
 		var p = {};
 		p.style = 'flat';
 		if (typeof d === 'undefined')
-			throw "input argument d is undefined";
+			throw new Error("input argument d is undefined");
 		p.diameter = d;
 		return createCuttingObject(p);
 	}
