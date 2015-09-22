@@ -8,8 +8,8 @@
 
 "use strict";
 
-var Line = function(prm) {
-    if (typeof prm ==='undefined')
+function Line(prm) {
+    if (typeof prm === 'undefined')
         throw new Error("parameters are undefined");
     if ('p1' in prm && 'p2' in prm) {
         if (typeof prm.p1 !== 'object' || prm.p1.length != 2)
@@ -32,7 +32,7 @@ var Line = function(prm) {
         this.dist = prm.dist;
     } else
         throw new Error("wrong parameters");
-};
+}
 
 Line.prototype = {
     intersect: function (that) {
@@ -72,7 +72,7 @@ Line.prototype = {
  * @returns {Arc}
  * @constructor
  */
-var Arc = function(prm) {
+function Arc(prm) {
     
     var p1, p2, p3;
     var p0, r, phi1, phi2, isccw;
@@ -89,7 +89,7 @@ var Arc = function(prm) {
         p2 = prm.p2;
         p3 = prm.p3;
 
-        var det3x3 = function(a,b,c) {
+        var det3x3 = function det3x3(a,b,c) {
             return a[0]*b[1]*c[2]+a[2]*b[0]*c[1]+a[1]*b[2]*c[0]-a[2]*b[1]*c[0]-a[1]*b[0]*c[2]-a[0]*b[2]*c[1];
         };
         var tmp1 = [p1[0], p2[0], p3[0]];
@@ -198,7 +198,7 @@ var Arc = function(prm) {
 
     } else
         throw new Error("unsupported list of parameters");
-};
+}
 
 Arc.prototype = {
     points: function(AbsTol) {
