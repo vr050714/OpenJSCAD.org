@@ -4,9 +4,9 @@
  * classes and use them like ruler and compasses.
  */
 
-'use strict'
-
 (function geomNamespace(module) {
+
+"use strict";
 
 var Line = function(prm) {
     if (typeof prm ==='undefined')
@@ -194,13 +194,13 @@ var Arc = function(prm) {
         this.Bulge = (isccw ? 1.0 : -1.0) * Math.tan((phi2-phi1)/4.0);
 
     } else
-        throw new Error("unsupported list of parameters";
+        throw new Error("unsupported list of parameters");
 };
 
 Arc.prototype = {
     points: function(AbsTol) {
         // AbsTol - maximal distance between arc and segments
-        if (typeof AbsTo === 'undefined')
+        if (typeof AbsTol === 'undefined')
             AbsTol = 0.1; // [mm], should be enough for 3D printing
         if (typeof AbsTol !== 'number')
             throw new Error("AbsTol is not a number");
