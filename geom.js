@@ -73,6 +73,10 @@ Line.prototype = {
  * @constructor
  */
 var Arc = function(prm) {
+    
+    var p1, p2, p3;
+    var p0, r, phi1, phi2, isccw;
+    
     if (Object.keys(prm).length == 3 && 'p1' in prm && 'p2' in prm && 'p3' in prm) {
         if (typeof prm.p1 !== 'object' || prm.p1.length != 2)
             throw new Error("p1 is not 1x2 array");
@@ -81,13 +85,12 @@ var Arc = function(prm) {
         if (typeof prm.p3 !== 'object' || prm.p3.length != 2)
             throw new Error("p3 is not 1x2 array");
 
-        var p1 = prm.p1;
-        var p2 = prm.p2;
-        var p3 = prm.p3;
+        p1 = prm.p1;
+        p2 = prm.p2;
+        p3 = prm.p3;
 
         var det3x3 = function(a,b,c) {
-            return a[0]*b[1]*c[2]+a[2]*b[0]*c[1]+a[1]*b[2]*c[0]
-                  -a[2]*b[1]*c[0]-a[1]*b[0]*c[2]-a[0]*b[2]*c[1];
+            return a[0]*b[1]*c[2]+a[2]*b[0]*c[1]+a[1]*b[2]*c[0]-a[2]*b[1]*c[0]-a[1]*b[0]*c[2]-a[0]*b[2]*c[1];
         };
         var tmp1 = [p1[0], p2[0], p3[0]];
         var tmp2 = [p1[1], p2[1], p3[1]];
@@ -102,10 +105,11 @@ var Arc = function(prm) {
 
         var x0 = -bx/2.0/a;
         var y0 = -by/2.0/a;
-        var r = Math.sqrt(bx*bx+by*by-4*a*c)/2.0/Math.abs(a);
+        
+        r = Math.sqrt(bx*bx+by*by-4*a*c)/2.0/Math.abs(a);
 
-        var isccw = (p2[0]-p1[0])*(p3[1]-p1[1])-(p3[0]-p1[0])*(p2[1]-p1[1]) > 0;
-        var phi1, phi2;
+        isccw = (p2[0]-p1[0])*(p3[1]-p1[1])-(p3[0]-p1[0])*(p2[1]-p1[1]) > 0;
+
         if (isccw) {
             phi1 = Math.atan2(p1[1]-y0, p1[0]-x0);
             phi2 = Math.atan2(p3[1]-y0, p3[0]-x0);
@@ -132,8 +136,9 @@ var Arc = function(prm) {
         if (typeof prm.bulge !== "number")
             throw new Error("bulge is not a number");
 
-        var p1 = prm.p1;
-        var p2 = prm.p2;
+        p1 = prm.p1;
+        p2 = prm.p2;
+        
         var bulge = prm.bulge;
         var dpx = p2[0] - p1[0];
         var dpy = p2[1] - p1[1];
@@ -161,16 +166,14 @@ var Arc = function(prm) {
         if (typeof prm.isccw !== 'boolean')
             throw new Error("end is not a number");
 
-        var p0 = prm.center;
-        var r = prm.radius;
+        p0 = prm.center;
+        r = prm.radius;
         if (r <= 0)
             throw new Error("radius is not a positive number");
-        var isccw = prm.isccw;
-        var phi1 = prm.start;
-        var phi2 = prm.end;
+        isccw = prm.isccw;
+        phi1 = prm.start;
+        phi2 = prm.end;
         if (phi2<phi1) phi2 += 2.0 * Math.PI;
-
-        var p1, p3;
 
         if (isccw) {
             p1 = [p0[0] + r * Math.cos(phi1),
