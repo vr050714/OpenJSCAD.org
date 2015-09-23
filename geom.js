@@ -8,8 +8,8 @@
 
 "use strict";
 
-function Line(prm) {
-    if (typeof prm === 'undefined')
+var Line = function(prm) {
+    if (typeof prm === undefined)
         throw new Error("parameters are undefined");
     if ('p1' in prm && 'p2' in prm) {
         if (typeof prm.p1 !== 'object' || prm.p1.length != 2)
@@ -32,7 +32,7 @@ function Line(prm) {
         this.dist = prm.dist;
     } else
         throw new Error("wrong parameters");
-}
+};
 
 Line.prototype = {
     intersect: function (that) {
@@ -68,11 +68,11 @@ Line.prototype = {
  * Arc({p1:[1,0], p2:[-1,0], bulge:1})
  * Arc({center: [0,0], radius: 1, start: 0, end: Math.PI/2, isccw: true})
  *
- * @param prm
+ * @param {Object}
  * @returns {Arc}
  * @constructor
  */
-function Arc(prm) {
+var Arc = function(prm) {
     
     var p1, p2, p3;
     var p0, r, phi1, phi2, isccw;
@@ -89,9 +89,11 @@ function Arc(prm) {
         p2 = prm.p2;
         p3 = prm.p3;
 
-        var det3x3 = function det3x3(a,b,c) {
-            return a[0]*b[1]*c[2]+a[2]*b[0]*c[1]+a[1]*b[2]*c[0]-a[2]*b[1]*c[0]-a[1]*b[0]*c[2]-a[0]*b[2]*c[1];
+        var det3x3 = function(a,b,c) {
+            return a[0]*b[1]*c[2] + a[2]*b[0]*c[1] + a[1]*b[2]*c[0] - 
+                   a[2]*b[1]*c[0] - a[1]*b[0]*c[2] - a[0]*b[2]*c[1];
         };
+        
         var tmp1 = [p1[0], p2[0], p3[0]];
         var tmp2 = [p1[1], p2[1], p3[1]];
         var tmp3 = [p1[0]*p1[0]+p1[1]*p1[1],
@@ -198,12 +200,12 @@ function Arc(prm) {
 
     } else
         throw new Error("unsupported list of parameters");
-}
+};
 
 Arc.prototype = {
     points: function(AbsTol) {
         // AbsTol - maximal distance between arc and segments
-        if (typeof AbsTol === 'undefined')
+        if (typeof AbsTol === undefined)
             AbsTol = 0.1; // [mm], should be enough for 3D printing
         if (typeof AbsTol !== 'number')
             throw new Error("AbsTol is not a number");
@@ -240,7 +242,7 @@ function createCuttingObject(p) {
      diameter: diameter of the hole
      resolution: resolution of the circle
      */
-    if (typeof p === 'undefined') p = {};
+    if (typeof p === undefined) p = {};
 
     var d = 'diameter' in p ? p.diameter : 8;
     var CutStyle = 'style' in p ? p.style : 'flat';
@@ -303,7 +305,7 @@ module.geom = {
     octagon: function (d) {
         var p = {};
         p.style = 'octagon';
-        if (typeof d === 'undefined')
+        if (typeof d === undefined)
             throw new Error("input argument d is undefined");
         p.diameter = d;
         return createCuttingObject(p);
@@ -312,7 +314,7 @@ module.geom = {
     drop: function (d) {
         var p = {};
         p.style = 'corner';
-        if (typeof d === 'undefined')
+        if (typeof d === undefined)
             throw new Error("input argument d is undefined");
         p.diameter = d;
         return createCuttingObject(p);
@@ -321,7 +323,7 @@ module.geom = {
     flat: function (d) {
         var p = {};
         p.style = 'flat';
-        if (typeof d === 'undefined')
+        if (typeof d === undefined)
             throw new Error("input argument d is undefined");
         p.diameter = d;
         return createCuttingObject(p);
