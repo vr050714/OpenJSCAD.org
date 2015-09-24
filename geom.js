@@ -4,10 +4,18 @@
  * classes and use them like ruler and compasses.
  */
 
-(function geomNamespace(module) {
+(function(module) {
 
 "use strict";
 
+/**
+ * Line class helps to find intersection points, projections, distances to the
+ * geometrical lines.
+ * 
+ * @constructor
+ * @param {Object}
+ * @returns {Line}
+ */
 var Line = function(prm) {
     if (typeof prm === undefined)
         throw new Error("parameters are undefined");
