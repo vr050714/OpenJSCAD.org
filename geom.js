@@ -8,65 +8,110 @@
 
 "use strict";
 
+var Vector2d = function(x, y) {
+	if (y === undefined && x instanceof Array && x.length == 2)
+		this.p = x.slice(0);
+	else if (typeof x === 'number' && typeof y === 'number')
+		this.p = [x, y];
+	else
+		throw new Error("wrong type of input arguments");
+};
+
+Vector2d.prototype = {
+	norm: function() {
+		return Math.sqrt( this.p[0]*this.p[0] + this.p[1]*this.p[1] );
+	},
+	unit: function() {
+		var n = this.norm();
+		return new Vector2d(this.p[0]/n, this.p[1]/n);
+	},
+	dot: function(v) {
+		return this.p[0]*v.p[0] + this.p[1]*v.p[1];
+	},
+	cross: function(v) {
+		return this.p[0]*v.p[1] - this.p[1]*v.p[0];
+	},
+	add: function(v) {
+		if (v instanceof Vector2d)
+			return new Vector2d(this.p[0]+v.p[0], this.p[1]+v.p[1]);
+		else if (v instanceof Array && v.length == 2)
+			return new Vector2d(this.p[0]+v[0], this.p[1]+v[1]);
+		else
+			throw new Error("input argument is neither Vector2d nor 2D array");
+	},
+	sub: function(v) {
+		if (v instanceof Vector2d)
+			return new Vector2d(this.p[0]-v.p[0], this.p[1]-v.p[1]);
+		else if (v instanceof Array && v.length == 2)
+			return new Vector2d(this.p[0]-v[0], this.p[1]-v[1]);
+		else
+			throw new Error("input argument is neither Vector2d nor 2D array");
+	},
+	scale: function(c) {
+		return new Vector2d(c*this.p[0], c*this.p[1]);
+	},
+	rotate: function(ang) {
+		var c = Math.cos(ang);
+		var s = Math.sin(ang);
+		return new Vector2d(c*this.p[0]-s*this.p[1], s*this.p[0]+c*this.p[1]);
+	},
+	reflect: function(ln) {
+		if (ln === undefined || ln instanceof Line)
+			throw new Error("input argument must be a Line");
+		return null;
+	},
+	clone: function() {
+		return new Vector2d(this.p[0], this.p[1]);
+	},
+	toArray: function() {
+		return this.p.slice(0);
+	}
+};
+
 /**
  * Line class helps to find intersection points, projections, distances to the
  * geometrical lines.
- * 
- * @constructor
- * @param {Object}
- * @returns {Line}
  */
-var Line = function(prm) {
-    if (typeof prm === undefined)
-        throw new Error("parameters are undefined");
-    if ('p1' in prm && 'p2' in prm) {
-        if (typeof prm.p1 !== 'object' || prm.p1.length != 2)
-            throw new Error("p1 is not 1x2 element array");
-        if (typeof prm.p2 !== 'object' || prm.p2.length != 2)
-            throw new Error("p2 is not 1x2 element array");
-        var p1 = prm.p1.slice(0);
-        var p2 = prm.p2.slice(0);
-        var tx = p2[0]-p1[0];
-        var ty = p2[1]-p1[1];
-        var tn = Math.sqrt(tx*tx+ty*ty);
-        this.norm = [-ty/tn, tx/tn];
-        this.dist = this.norm[0]*p1[0]+this.norm[1]*p1[1];
-    } else if ('norm' in prm && 'dist' in prm) {
-        if (typeof prm.norm !== 'object' || prm.norm.length != 2)
-            throw new Error("norm is not 1x2 element array");
-        if (typeof prm.dist !== 'number')
-            throw new Error("dist is not a number");
-        this.norm = prm.norm.slice(0);
-        this.dist = prm.dist;
-    } else
-        throw new Error("wrong parameters");
+
+var Line = function(p, n) {
+	// add point
+	if (p instanceof Vector2d)
+		this.p = p.clone();
+	else if (p instanceof Array && p.length == 2)
+		this.p = new Vector2d(p[0], p[1]);
+	else
+		throw new Error("point must be a Vector2d or 2D array");
+	// add normal
+	if (n instanceof Vector2d)
+		this.n = n.clone();
+	else if (n instanceof Array && n.length == 2)
+		this.n = new Vector2d(n[0], n[1]);
+	else
+		throw new Error("normal must be a Vector2d or 2D array");
+	// distance to line
+	this.d = this.p.dot(this.n)/this.n.norm();
 };
 
 Line.prototype = {
-    intersect: function (that) {
-        if (that instanceof Line) {
-            var det = this.norm[0] * that.norm[1] - that.norm[0] * this.norm[1];
-            if (Math.abs(det) > 1e-15)
-                return [(this.dist * that.norm[1] - that.dist * this.norm[1]) / det,
-                    (this.norm[0] * that.dist - that.norm[0] * this.dist   ) / det];
-            else
-                return null; // lines are parallel
-        } else
-            throw new Error("unsupported type");
-    },
-
-    distance: function (p) {
-        if (typeof p !== 'object' || p.length != 2)
-            throw new Error("p is not 1x2 element array");
-        return this.norm[0] * p[0] + this.norm[1] * p[1] - this.dist;
-    },
-
-    projection: function (p) {
-        if (typeof p !== 'object' && p.length != 2)
-            throw new Error("p is not 1x2 element array");
-        var s = this.norm[0] * p[0] + this.norm[1] * p[1] - this.dist;
-        return [p[0] - s * this.norm[0], p[1] - s * this.norm[1]];
-    }
+	intersect: function(ln) {
+		if (!(ln instanceof Line))
+			throw new Error("input argument is not an instance of Line class");
+		// check for parallel
+		var det = this.n.cross(ln.n);
+		var norm1 = this.n.norm();
+		var norm2 = ln.n.norm();
+		var RelTol = 2e-16;
+		if (Math.abs(det) < RelTol*norm1*norm2)
+			throw new Error("linear system is bad conditioned");
+		var pi2 = Math.PI/2;
+		return this.n.rotate(pi2).scale(ln.d/det).sub(ln.n.rotate(pi2).scale(this.d/det));
+	},
+	reflect: function(ln) {
+		return null;
+	},
+	clone: function() {
+		return new Line(this.p, this.n);
+	}
 };
 
 /**
@@ -75,10 +120,6 @@ Line.prototype = {
  * Arc({p1:[1,0], p2:[0,1], p3:[-1,0]})
  * Arc({p1:[1,0], p2:[-1,0], bulge:1})
  * Arc({center: [0,0], radius: 1, start: 0, end: Math.PI/2, isccw: true})
- *
- * @param {Object}
- * @returns {Arc}
- * @constructor
  */
 var Arc = function(prm) {
     
