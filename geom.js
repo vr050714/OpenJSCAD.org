@@ -337,9 +337,13 @@ function createCuttingObject(p) {
 }
 
 module.geom = {
-
-    line: function(prm) {
-        return new Line(prm);
+	
+	point: function(x, y) {
+		return new Vector2d(x, y);
+	},
+	
+    line: function(p, n) {
+    	return new Line(p, n);
     },
 
     arc: function(prm) {
