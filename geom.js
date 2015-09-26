@@ -9,63 +9,63 @@
 "use strict";
 
 var Vector2d = function(x, y) {
-	if (y === undefined && x instanceof Array && x.length == 2)
-		this.p = x.slice(0);
-	else if (typeof x === 'number' && typeof y === 'number')
-		this.p = [x, y];
-	else
-		throw new Error("wrong type of input arguments");
+    if (y === undefined && x instanceof Array && x.length == 2)
+        this.p = x.slice(0);
+    else if (typeof x === 'number' && typeof y === 'number')
+        this.p = [x, y];
+    else
+        throw new Error("wrong type of input arguments");
 };
 
 Vector2d.prototype = {
-	norm: function() {
-		return Math.sqrt( this.p[0]*this.p[0] + this.p[1]*this.p[1] );
-	},
-	unit: function() {
-		var n = this.norm();
-		return new Vector2d(this.p[0]/n, this.p[1]/n);
-	},
-	dot: function(v) {
-		return this.p[0]*v.p[0] + this.p[1]*v.p[1];
-	},
-	cross: function(v) {
-		return this.p[0]*v.p[1] - this.p[1]*v.p[0];
-	},
-	add: function(v) {
-		if (v instanceof Vector2d)
-			return new Vector2d(this.p[0]+v.p[0], this.p[1]+v.p[1]);
-		else if (v instanceof Array && v.length == 2)
-			return new Vector2d(this.p[0]+v[0], this.p[1]+v[1]);
-		else
-			throw new Error("input argument is neither Vector2d nor 2D array");
-	},
-	sub: function(v) {
-		if (v instanceof Vector2d)
-			return new Vector2d(this.p[0]-v.p[0], this.p[1]-v.p[1]);
-		else if (v instanceof Array && v.length == 2)
-			return new Vector2d(this.p[0]-v[0], this.p[1]-v[1]);
-		else
-			throw new Error("input argument is neither Vector2d nor 2D array");
-	},
-	scale: function(c) {
-		return new Vector2d(c*this.p[0], c*this.p[1]);
-	},
-	rotate: function(ang) {
-		var c = Math.cos(ang);
-		var s = Math.sin(ang);
-		return new Vector2d(c*this.p[0]-s*this.p[1], s*this.p[0]+c*this.p[1]);
-	},
-	reflect: function(ln) {
-		if (ln === undefined || ln instanceof Line)
-			throw new Error("input argument must be a Line");
-		return null;
-	},
-	clone: function() {
-		return new Vector2d(this.p[0], this.p[1]);
-	},
-	toArray: function() {
-		return this.p.slice(0);
-	}
+    norm: function() {
+        return Math.sqrt( this.p[0]*this.p[0] + this.p[1]*this.p[1] );
+    },
+    unit: function() {
+        var n = this.norm();
+        return new Vector2d(this.p[0]/n, this.p[1]/n);
+    },
+    dot: function(v) {
+        return this.p[0]*v.p[0] + this.p[1]*v.p[1];
+    },
+    cross: function(v) {
+        return this.p[0]*v.p[1] - this.p[1]*v.p[0];
+    },
+    add: function(v) {
+        if (v instanceof Vector2d)
+            return new Vector2d(this.p[0]+v.p[0], this.p[1]+v.p[1]);
+        else if (v instanceof Array && v.length == 2)
+            return new Vector2d(this.p[0]+v[0], this.p[1]+v[1]);
+        else
+            throw new Error("input argument is neither Vector2d nor 2D array");
+    },
+    sub: function(v) {
+        if (v instanceof Vector2d)
+            return new Vector2d(this.p[0]-v.p[0], this.p[1]-v.p[1]);
+        else if (v instanceof Array && v.length == 2)
+            return new Vector2d(this.p[0]-v[0], this.p[1]-v[1]);
+        else
+            throw new Error("input argument is neither Vector2d nor 2D array");
+    },
+    scale: function(c) {
+        return new Vector2d(c*this.p[0], c*this.p[1]);
+    },
+    rotate: function(ang) {
+        var c = Math.cos(ang);
+        var s = Math.sin(ang);
+        return new Vector2d(c*this.p[0]-s*this.p[1], s*this.p[0]+c*this.p[1]);
+    },
+    reflect: function(ln) {
+        if (ln === undefined || ln instanceof Line)
+            throw new Error("input argument must be a Line");
+        return null;
+    },
+    clone: function() {
+        return new Vector2d(this.p[0], this.p[1]);
+    },
+    toArray: function() {
+        return this.p.slice(0);
+    }
 };
 
 /**
@@ -74,44 +74,44 @@ Vector2d.prototype = {
  */
 
 var Line = function(p, n) {
-	// add point
-	if (p instanceof Vector2d)
-		this.p = p.clone();
-	else if (p instanceof Array && p.length == 2)
-		this.p = new Vector2d(p[0], p[1]);
-	else
-		throw new Error("point must be a Vector2d or 2D array");
-	// add normal
-	if (n instanceof Vector2d)
-		this.n = n.clone();
-	else if (n instanceof Array && n.length == 2)
-		this.n = new Vector2d(n[0], n[1]);
-	else
-		throw new Error("normal must be a Vector2d or 2D array");
-	// distance to line
-	this.d = this.p.dot(this.n)/this.n.norm();
+    // add point
+    if (p instanceof Vector2d)
+        this.p = p.clone();
+    else if (p instanceof Array && p.length == 2)
+        this.p = new Vector2d(p[0], p[1]);
+    else
+        throw new Error("point must be a Vector2d or 2D array");
+    // add normal
+    if (n instanceof Vector2d)
+        this.n = n.clone();
+    else if (n instanceof Array && n.length == 2)
+        this.n = new Vector2d(n[0], n[1]);
+    else
+        throw new Error("normal must be a Vector2d or 2D array");
+    // distance to line
+    this.d = this.p.dot(this.n)/this.n.norm();
 };
 
 Line.prototype = {
-	intersect: function(ln) {
-		if (!(ln instanceof Line))
-			throw new Error("input argument is not an instance of Line class");
-		// check for parallel
-		var det = this.n.cross(ln.n);
-		var norm1 = this.n.norm();
-		var norm2 = ln.n.norm();
-		var RelTol = 2e-16;
-		if (Math.abs(det) < RelTol*norm1*norm2)
-			throw new Error("linear system is bad conditioned");
-		var pi2 = Math.PI/2;
-		return this.n.rotate(pi2).scale(ln.d/det).sub(ln.n.rotate(pi2).scale(this.d/det));
-	},
-	reflect: function(ln) {
-		return null;
-	},
-	clone: function() {
-		return new Line(this.p, this.n);
-	}
+    intersect: function(ln) {
+        if (!(ln instanceof Line))
+            throw new Error("input argument is not an instance of Line class");
+        // check for parallel
+        var det = this.n.cross(ln.n);
+        var norm1 = this.n.norm();
+        var norm2 = ln.n.norm();
+        var RelTol = 2e-16;
+        if (Math.abs(det) < RelTol*norm1*norm2)
+            throw new Error("linear system is bad conditioned");
+        var pi2 = Math.PI/2;
+        return this.n.rotate(pi2).scale(ln.d/det).sub(ln.n.rotate(pi2).scale(this.d/det));
+    },
+    reflect: function(ln) {
+        return null;
+    },
+    clone: function() {
+        return new Line(this.p, this.n);
+    }
 };
 
 /**
