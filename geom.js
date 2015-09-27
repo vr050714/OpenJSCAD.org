@@ -71,23 +71,48 @@ Vector2d.prototype = {
 /**
  * Line class helps to find intersection points, projections, distances to the
  * geometrical lines.
+ * Line({p1:[0,1], p2:[1,0]}); // construct from two points
+ * Line({p:[2,1], n:[0,1]});  // construct from point and normal
  */
-
-var Line = function(p, n) {
-    // add point
-    if (p instanceof Vector2d)
-        this.p = p.clone();
-    else if (p instanceof Array && p.length == 2)
-        this.p = new Vector2d(p[0], p[1]);
-    else
-        throw new Error("point must be a Vector2d or 2D array");
-    // add normal
-    if (n instanceof Vector2d)
-        this.n = n.clone();
-    else if (n instanceof Array && n.length == 2)
-        this.n = new Vector2d(n[0], n[1]);
-    else
-        throw new Error("normal must be a Vector2d or 2D array");
+var Line = function(prm) {
+	
+	if (prm === undefined || typeof prm !== 'object')
+		throw new Error("input argument must be object");
+	
+	if ('p1' in prm && 'p2' in prm) {
+		// line from two points
+		var p1, p2;
+		if (prm.p1 instanceof Vector2d)
+			p1 = prm.p1.clone();
+		else if (prm.p1 instanceof Array && prm.p1.length == 2)
+			p1 = new Vector2d(prm.p1);
+		else
+			throw new Error("'p1' must be Vector2d or array");
+		if (prm.p2 instanceof Vector2d)
+			p2 = prm.p2.clone();
+		else if (prm.p2 instanceof Array && prm.p2.length == 2)
+			p2 = new Vector2d(prm.p2);
+		else
+			throw new Error("'p2' must be Vector2d or array");
+		this.p = p1.clone();
+		this.n = p2.sub(p1).unit().rotate(Math.PI/2);
+	} else if ('p' in prm && 'n' in prm) {
+		// point and normal
+		if (prm.p instanceof Vector2d)
+			this.p = prm.p.clone();
+		else if (prm.p instanceof Array && prm.p.length == 2)
+			this.p = new Vector2d(prm.p);
+		else
+			throw new Error("'p' must be array or Vector2d");
+		if (prm.n instanceof Vector2d)
+			this.n = prm.n.clone();
+		else if (prm.n instanceof Array && prm.n.length == 2)
+			this.n = new Vector2d(prm.n);
+		else
+			throw new Error("'n' must be array or Vector2d")
+	} else
+		throw new Error("wrong fields");
+	
     // distance to line
     this.d = this.p.dot(this.n)/this.n.norm();
 };
@@ -342,8 +367,8 @@ module.geom = {
 		return new Vector2d(x, y);
 	},
 	
-    line: function(p, n) {
-    	return new Line(p, n);
+    line: function(prm) {
+    	return new Line(prm);
     },
 
     arc: function(prm) {
